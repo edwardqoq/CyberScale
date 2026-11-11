@@ -9,6 +9,10 @@
 ![version](https://img.shields.io/badge/version-1.1.0-00F0FF)
 ![License](https://img.shields.io/badge/License-Apache_2.0-blue)
 
+![NEON//SCALE 四屏动态演示](docs/demo/neon-scale-demo.gif)
+
+<p align="center"><sub>12 秒演示 · 画面由真实界面代码渲染 · <a href="docs/demo/neon-scale-demo.mp4">下载 1080p 版本</a> · <a href="docs/demo/README.md">素材说明</a></sub></p>
+
 不使用 GATT 连接、不联网、无账号、无第三方 SDK。秤只负责广播一个体重数值，其余全部由本机完成：解析帧、稳定判定、落进 Room、驱动霓虹动效。
 
 > **硬件范围**：针对**纯广播型**体重秤（实测机型：康佳 KONKA KTZC-1804W-T，云康 / OKOK Chipsea 2.0 协议）。它不接受 GATT 连接，广播帧里**只有体重**，没有体脂、肌肉、电量等成分数据。
@@ -60,6 +64,7 @@ Windows 用 `copy local.properties.example local.properties` 和 `gradlew.bat as
 | [docs/05-visual-design.md](docs/05-visual-design.md) | 色板、动效清单、四屏说明、交互预览页 |
 | [docs/06-verification-and-limits.md](docs/06-verification-and-limits.md) | 校验脚本、验证记录、已知限制、与参考工程对照 |
 | [docs/07-publish-to-github.md](docs/07-publish-to-github.md) | 首次推送、后续更新、Releases 上传 APK、仓库设置建议 |
+| [docs/demo/](docs/demo/) | 演示片素材：README 用 GIF、1080p MP4、海报、生成脚本 |
 | [docs/design-history/](docs/design-history/) | 初版 UI 重设计方案（**历史资料，非当前视觉**） |
 | [CHANGELOG.md](CHANGELOG.md) · [CONTRIBUTING.md](CONTRIBUTING.md) | 版本记录 · 参与开发 |
 
@@ -79,8 +84,9 @@ CyberScale/                      ← Git 仓库根
 │   │   └── ui/      # Compose 页面 / 组件 / 主题（Canvas 自绘）
 │   ├── res/         # 主题、颜色、自适应图标、备份规则
 │   └── AndroidManifest.xml
-├── docs/            # 专题文档 + preview.html + design-history/
+├── docs/            # 专题文档 + preview.html + demo/ + design-history/
 ├── scripts/         # 两个离线校验脚本（纯 Python，无需 Gradle / 真机）
+├── tools/demo/      # 演示片源文件：stage.html 时间轴舞台 + 逐帧截图脚本
 ├── releases/        # 本地 APK（.gitignore 排除，走 GitHub Releases）
 ├── build.gradle.kts · settings.gradle.kts · gradle.properties
 ├── gradlew · gradlew.bat · gradle/wrapper/

@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>NEON//SCALE · 演示片舞台</title>
+<style>
+:root{
+  --bg:#05060F; --surf:#0B1020; --surf2:#101A33; --line:#1D2C4E; --grid:#14203A;
+  --cyan:#00F0FF; --magenta:#FF2E97; --purple:#8B5CF6;
+  --green:#39FF88; --amber:#FFB020; --blue:#38BDF8;
+  --t1:#E9F6FF; --t2:#8194BC; --t3:#4A5B7F;
+  --mono:Consolas,"Cascadia Mono",monospace;
+  --sans:"Microsoft YaHei","PingFang SC",sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{width:1920px;height:1080px;overflow:hidden;background:#000}
+#stage{position:relative;width:1920px;height:1080px;overflow:hidden;
+  background:radial-gradient(circle at 14% 0%,rgba(0,240,255,.10),transparent 42%),
+             radial-gradient(circle at 88% 100%,rgba(255,46,151,.10),transparent 46%),
+             linear-gradient(165deg,#0A0F22,#05060F 55%,#02030A);
+}
+#stage > *{position:absolute}
+
+/* ---------- 背景 ---------- */
+#grid{inset:0;opacity:0;
+  background-image:linear-gradient(rgba(20,32,58,.9) 1px,transparent 1px),linear-gradient(90deg,rgba(20,32,58,.9) 1px,transparent 1px);
+  background-size:48px 48px;
+  mask-image:radial-gradient(circle at 50% 46%,#000 28%,transparent 78%);
+  -webkit-mask-image:radial-gradient(circle at 50% 46%,#000 28%,transparent 78%)}
+#g1,#g2{width:900px;height:900px;border-radius:50%;filter:blur(90px);opacity:0}
+#g1{left:-260px;top:-300px;background:rgba(0,240,255,.20)}
+#g2{right:-300px;bottom:-360px;background:rgba(255,46,151,.16)}
+#scan{left:0;right:0;height:260px;top:-260px;opacity:0;
+  background:linear-gradient(180deg,transparent,rgba(0,240,255,.05) 55%,rgba(0,240,255,.13));
+  border-bottom:1px solid rgba(0,240,255,.26);
+  mask-image:linear-gradient(90deg,transparent,#000 16%,#000 84%,transparent);
+  -webkit-mask-image:linear-gradient(90deg,transparent,#000 16%,#000 84%,transparent)}
+.vignette{inset:0;pointer-events:none;
+  background:radial-gradient(circle at 50% 50%,transparent 52%,rgba(0,0,0,.72) 100%)}
+
+/* HUD 四角 */
+.hud{width:46px;height:46px;border:1px solid rgba(0,240,255,.28);opacity:0}
+.hud.tl{left:38px;top:38px;border-right:0;border-bottom:0}
+.hud.tr{right:38px;top:38px;border-left:0;border-bottom:0}
+.hud.bl{left:38px;bottom:38px;border-right:0;border-top:0}
+.hud.br{right:38px;bottom:38px;border-left:0;border-top:0}
+
+/* ---------- 标题 ---------- */
+#head{left:96px;top:56px;width:900px}
+#logo{position:relative;font:900 66px/1 var(--mono);letter-spacing:-3px;color:var(--t1)}
+#logo .a{color:var(--cyan);text-shadow:0 0 34px rgba(0,240,255,.75)}
+#logo .b{color:var(--magenta);text-shadow:0 0 30px rgba(255,46,151,.6)}
+#logo span.ch{position:relative;display:inline-block;opacity:0}
+#tagline{margin-top:16px;font:600 15px var(--mono);letter-spacing:7px;color:var(--cyan);opacity:0}
+#sub{margin-top:12px;font-size:19px;letter-spacing:2px;color:var(--t2);opacity:0}
+#sub b{color:var(--t1);font-weight:500}
+
+/* ---------- 设备阵列 ---------- */
+#board{left:50%;top:252px;transform:translateX(-50%);width:1480px;height:720px;
+  display:flex;align-items:flex-start;justify-content:space-between}
+.device{position:relative;width:340px;height:720px;border-radius:30px;overflow:hidden;
+  background:var(--bg);border:1px solid rgba(0,240,255,.16);
+  box-shadow:0 18px 48px rgba(0,0,0,.55),0 0 0 1px rgba(0,240,255,.06),0 0 46px rgba(0,240,255,.06);
+  opacity:0;transform:translateY(90px)}
+.dlabel{position:relative;display:flex;align-items:center;gap:8px;height:30px;padding:0 13px;
+  border-bottom:1px solid var(--line);background:rgba(11,16,32,.92);
+  font:10px var(--mono);letter-spacing:1.6px;color:var(--t2)}
+.dlabel b{color:var(--cyan);font-weight:700}
+.dlabel em{margin-left:auto;font-style:normal;color:var(--t3);font-size:9px}
+.screen{position:relative;height:690px;overflow:hidden;padding:0 14px 54px;display:flex;flex-direction:column;
+  background:radial-gradient(circle at 0 0,rgba(0,240,255,.09),transparent 56%),
+             radial-gradient(circle at 100% 100%,rgba(255,46,151,.08),transparent 56%),var(--bg)}
+.screen:before{content:"";position:absolute;inset:0;
+  background-image:linear-gradient(rgba(20,32,58,.85) 1px,transparent 1px),linear-gradient(90deg,rgba(20,32,58,.85) 1px,transparent 1px);
+  background-size:26px 26px}
+.screen>*{position:relative;z-index:2}
+.sline{position:absolute;left:0;right:0;height:70px;top:-80px;z-index:1;
+  background:linear-gradient(180deg,transparent,rgba(0,240,255,.10));
+  border-bottom:1px solid rgba(0,240,255,.34)}
+
+.status{display:flex;justify-content:space-between;font:9px var(--mono);color:var(--t2);padding:8px 2px 4px}
+.topbar{display:flex;align-items:center;font:900 13px var(--mono);letter-spacing:-.6px;padding:4px 0 9px;
+  border-bottom:1px solid var(--line);margin-bottom:10px}
+.topbar .a{color:var(--cyan)}.topbar .b{color:var(--magenta)}
+.led{width:6px;height:6px;border-radius:50%;background:var(--green);margin-left:auto;box-shadow:0 0 10px var(--green)}
+.pause{margin-left:8px;width:11px;height:11px;border-left:3px solid var(--t2);border-right:3px solid var(--t2)}
+
+/* 成员条 */
+.chips{display:flex;gap:7px;padding-bottom:5px}
+.chip{position:relative;display:flex;align-items:center;gap:6px;padding:4px 9px;border-radius:11px;
+  border:1px solid var(--line);background:var(--surf2);font-size:10px;color:var(--t2);white-space:nowrap}
+.chip.on{border-color:rgba(0,240,255,.7);background:rgba(0,240,255,.11);color:var(--cyan)}
+.av{position:relative;width:20px;height:20px;border-radius:50%;display:grid;place-items:center;
+  font-size:10px;font-weight:700;background:rgba(0,240,255,.15);color:var(--cyan)}
+.chip.mg .av{background:rgba(255,46,151,.15);color:var(--magenta)}
+.chip.pu .av{background:rgba(139,92,246,.16);color:var(--purple)}
+
+/* 仪表 */
+.gauge{position:relative;flex:1;min-height:242px;display:grid;place-items:center;margin-top:2px}
+.ripple{position:absolute;width:216px;height:216px;border-radius:50%;border:1px solid rgba(0,240,255,.32);opacity:0}
+.ringwrap{position:absolute;width:204px;height:204px}
+.ringwrap svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.ticks{position:absolute;inset:-11px;border-radius:50%;opacity:.34;
+  background:repeating-conic-gradient(from 0deg,rgba(0,240,255,.55) 0deg .55deg,transparent .55deg 5deg);
+  mask:radial-gradient(farthest-side,transparent calc(100% - 7px),#000 calc(100% - 6px));
+  -webkit-mask:radial-gradient(farthest-side,transparent calc(100% - 7px),#000 calc(100% - 6px))}
+.dot{position:absolute;left:50%;top:50%;width:8px;height:8px;margin:-4px 0 0 -4px;border-radius:50%;
+  background:#fff;box-shadow:0 0 12px var(--cyan),0 0 26px var(--cyan)}
+.readout{position:relative;text-align:center;z-index:3}
+.readout .val{font:700 47px/1 var(--mono);letter-spacing:-2px;color:var(--t1)}
+.readout .val small{font-size:19px;letter-spacing:0;color:var(--t2);margin-left:3px}
+.readout .unit{font:9px var(--mono);letter-spacing:3px;color:var(--t2);margin-top:10px;opacity:.7}
+.lock{margin-top:7px;display:inline-flex;align-items:center;gap:5px;padding:2px 8px;border-radius:9px;
+  border:1px solid rgba(57,255,136,.45);background:rgba(57,255,136,.10);font:9px var(--mono);color:var(--green);letter-spacing:1px}
+.lock i{width:4px;height:4px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green)}
+
+/* BMI 卡 */
+.bmi{position:relative;border:1px solid rgba(57,255,136,.34);border-radius:14px;padding:10px 11px;
+  background:linear-gradient(180deg,rgba(57,255,136,.09),rgba(11,16,32,.9));overflow:hidden;opacity:0;transform:translateY(14px)}
+.bmi .row{display:flex;align-items:flex-end;gap:8px}
+.bmi .n{font:700 27px/1 var(--mono);color:var(--green);text-shadow:0 0 18px rgba(57,255,136,.55)}
+.bmi .k{font:8px var(--mono);color:var(--t3);letter-spacing:1.5px;margin-bottom:3px}
+.badge{margin-left:auto;font:700 11px var(--sans);color:#04170C;background:var(--green);
+  padding:3px 9px;border-radius:8px;box-shadow:0 0 16px rgba(57,255,136,.5)}
+.scale4{display:flex;gap:4px;margin-top:9px}
+.scale4 i{flex:1;height:4px;border-radius:3px;background:rgba(255,255,255,.09)}
+.scale4 i.on1{background:var(--blue);box-shadow:0 0 8px var(--blue)}
+.scale4 i.on2{background:var(--green);box-shadow:0 0 8px var(--green)}
+.scale4 i.on3{background:var(--amber)}.scale4 i.on4{background:var(--magenta)}
+.legend{display:flex;justify-content:space-between;margin-top:5px;font:8px var(--mono);color:var(--t3)}
+
+/* 三指标 */
+.trio{display:flex;gap:6px;margin-top:8px}
+.trio div{flex:1;border:1px solid var(--line);border-radius:10px;padding:7px 8px;background:rgba(11,16,32,.8)}
+.trio em{display:block;font:8px var(--mono);color:var(--t3);letter-spacing:1px;font-style:normal}
+.trio b{font:700 15px var(--mono);color:var(--t1)}
+.trio span{font-size:8px;color:var(--t3);margin-left:1px}
+
+/* 遥测 */
+.tele{margin-top:auto;border:1px solid var(--line);border-radius:10px;padding:7px 9px;background:rgba(4,7,16,.85);overflow:hidden}
+.tele .h{font:8px var(--mono);letter-spacing:2px;color:var(--cyan);opacity:.85;margin-bottom:5px}
+.hexlines{height:37px;overflow:hidden;position:relative}
+.hexlines div{font:9px/12.5px var(--mono);color:var(--green);opacity:.82;white-space:nowrap}
+.cur{display:inline-block;width:5px;height:9px;background:var(--cyan);vertical-align:-1px;margin-left:2px}
+.tele .f{display:flex;gap:10px;margin-top:4px;font:8px var(--mono);color:var(--t3)}
+
+/* 趋势 */
+.tabs{display:flex;gap:5px;margin:2px 0 9px}
+.tab{font:9px var(--mono);padding:3px 9px;border-radius:8px;border:1px solid var(--line);color:var(--t3)}
+.tab.on{border-color:rgba(0,240,255,.6);color:var(--cyan);background:rgba(0,240,255,.10)}
+.chart{position:relative;flex:1;min-height:212px;border:1px solid var(--line);border-radius:12px;
+  background:linear-gradient(180deg,rgba(0,240,255,.05),transparent 60%),rgba(11,16,32,.6);overflow:hidden}
+.chart svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.chart .glab{position:absolute;font:8px var(--mono);color:var(--t3)}
+.stat{display:flex;gap:6px;margin-top:8px}
+.stat div{flex:1;border:1px solid var(--line);border-radius:10px;padding:7px 8px;background:rgba(11,16,32,.8)}
+.stat em{display:block;font:8px var(--mono);color:var(--t3);font-style:normal;letter-spacing:1px}
+.stat b{font:700 16px var(--mono);color:var(--green)}
+.stat b.am{color:var(--amber)}
+.note{margin-top:auto;border:1px dashed rgba(0,240,255,.22);border-radius:10px;padding:7px 9px;
+  font:9px var(--mono);color:#A4B4D2;line-height:1.5}
+.note b{color:var(--cyan)}
+
+/* 档案 */
+.sumrow{display:flex;gap:6px;margin:2px 0 9px}
+.sumrow div{flex:1;border:1px solid var(--line);border-radius:10px;padding:6px 8px;background:rgba(11,16,32,.8)}
+.sumrow em{display:block;font:8px var(--mono);color:var(--t3);font-style:normal}
+.sumrow b{font:700 14px var(--mono);color:var(--t1)}
+.rec{position:relative;display:flex;align-items:center;gap:8px;padding:9px 10px;margin-bottom:6px;
+  border:1px solid var(--line);border-left:2px solid rgba(0,240,255,.5);border-radius:11px;
+  background:rgba(11,16,32,.82);opacity:0;transform:translateX(-14px)}
+.rec .d{font:8px var(--mono);color:var(--t3);width:44px}
+.rec .w{font:700 17px var(--mono);color:var(--t1)}
+.rec .w span{font-size:9px;color:var(--t3);margin-left:2px}
+.rec .b{margin-left:auto;font:700 8px var(--sans);color:#04170C;background:var(--green);padding:2px 6px;border-radius:6px}
+.rec .arn{color:var(--t3);font-size:12px}
+.rec.hl{border-color:rgba(57,255,136,.5);box-shadow:0 0 22px rgba(57,255,136,.14);background:rgba(57,255,136,.07)}
+.detail{position:absolute;left:10px;right:10px;bottom:60px;border-radius:14px;padding:11px;
+  border:1px solid rgba(57,255,136,.4);background:linear-gradient(180deg,rgba(9,20,16,.98),rgba(8,12,24,.98));
+  box-shadow:0 18px 50px rgba(0,0,0,.85),0 0 30px rgba(57,255,136,.14);opacity:0;transform:translateY(16px);z-index:5}
+.detail .dh{display:flex;align-items:center;gap:7px;font:9px var(--mono);color:var(--green);letter-spacing:1.5px;margin-bottom:8px}
+.detail .grid2{display:grid;grid-template-columns:1fr 1fr;gap:5px 8px}
+.detail .grid2 div{display:flex;justify-content:space-between;font:9px var(--mono);color:var(--t2);border-bottom:1px dashed rgba(29,44,78,.8);padding-bottom:3px}
+.detail .grid2 b{color:var(--t1);font-weight:700}
+.detail .dis{margin-top:8px;font:8px var(--mono);color:var(--t3);line-height:1.5}
+
+/* 成员 */
+.ucard{position:relative;display:flex;align-items:center;gap:9px;padding:10px;margin-bottom:7px;
+  border:1px solid var(--line);border-radius:13px;background:rgba(11,16,32,.85);opacity:0;transform:translateY(10px)}
+.ucard.on{border-color:rgba(0,240,255,.6);background:rgba(0,240,255,.07);box-shadow:0 0 24px rgba(0,240,255,.10)}
+.ucard .big{position:relative;width:34px;height:34px;border-radius:50%;display:grid;place-items:center;
+  font:700 14px var(--sans);background:rgba(0,240,255,.14);color:var(--cyan)}
+.ucard.mg .big{background:rgba(255,46,151,.14);color:var(--magenta)}
+.ucard.pu .big{background:rgba(139,92,246,.16);color:var(--purple)}
+.ucard .info{min-width:0;flex:1;overflow:hidden}
+.ucard .info b{display:block;font:600 12px var(--sans);color:var(--t1);white-space:nowrap}
+.ucard .info em{font:8px var(--mono);color:var(--t2);font-style:normal;white-space:nowrap;margin-top:3px;display:block;opacity:.85}
+.ucard .tag2{flex:0 0 auto;margin-left:8px;font:9px var(--mono);color:var(--t2);white-space:nowrap}
+.ucard.on .tag2{color:var(--cyan)}
+.addbtn{display:flex;align-items:center;justify-content:center;height:34px;border-radius:11px;
+  border:1px dashed rgba(0,240,255,.32);color:var(--cyan);font:9px var(--mono);letter-spacing:1px;
+  background:rgba(0,240,255,.04);margin-bottom:8px}
+.unitrow{display:flex;gap:5px;margin:9px 0}
+.unit{flex:1;text-align:center;font:9px var(--mono);padding:5px 0;border-radius:8px;border:1px solid var(--line);color:var(--t3)}
+.unit.on{border-color:rgba(0,240,255,.6);color:var(--cyan);background:rgba(0,240,255,.10)}
+.devbox{border:1px solid var(--line);border-radius:11px;padding:8px 10px;background:rgba(4,7,16,.8);margin-top:8px}
+.devbox div{display:flex;justify-content:space-between;font:8px var(--mono);color:var(--t3);padding:2px 0}
+.devbox b{color:var(--t2);font-weight:400}
+
+/* 底部导航 */
+.tabbar{position:absolute;left:0;right:0;bottom:0;height:52px;display:flex;z-index:6;
+  border-top:1px solid var(--line);background:rgba(8,12,24,.97)}
+.tabbar .tb{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;
+  font:9px var(--mono);color:var(--t3)}
+.tabbar .tb b{font-size:13px;font-weight:400;line-height:1;opacity:.75}
+.tabbar .tb i{font-style:normal;font-size:8px;letter-spacing:.4px}
+.tabbar .tb.on{color:var(--cyan)}
+.tabbar .tb.on b{opacity:1;text-shadow:0 0 10px var(--cyan)}
+
+/* ---------- 页脚 ---------- */
+#foot{left:0;right:0;bottom:54px;text-align:center;font:600 13px var(--mono);letter-spacing:4px;color:var(--t3);opacity:0}
+#foot span{position:relative;color:var(--t2)}
+#foot i{position:relative;color:rgba(0,240,255,.5);font-style:normal;margin:0 14px}
+</style>
+</head>
+<body>
+<div id="stage">
+  <div id="grid"></div>
+  <div id="g1"></div><div id="g2"></div>
+  <div id="scan"></div>
+  <div class="vignette"></div>
+  <div class="hud tl"></div><div class="hud tr"></div><div class="hud bl"></div><div class="hud br"></div>
+
+  <div id="head">
+    <div id="logo"></div>
+    <div id="tagline">PURE BLE BROADCAST SCALE</div>
+    <div id="sub">赛博朋克 · 纯广播秤 · <b>100% 本地存储</b></div>
+  </div>
+
+  <div id="board">
+
+    <!-- ============ 01 测量 ============ -->
+    <div class="device" id="d0">
+      <div class="dlabel"><b>01</b>MEASURE<em>LIVE</em></div>
+      <div class="screen">
+        <div class="sline" id="sline0"></div>
+        <div class="status"><span>23:41</span><span>BLE · 5G · 82%</span></div>
+        <div class="topbar"><span class="a">NEON</span><span class="b">//</span><span>SCALE</span><i class="led"></i><i class="pause"></i></div>
+        <div class="chips">
+          <div class="chip on"><span class="av">我</span>本人</div>
+          <div class="chip mg"><span class="av">太</span>太太</div>
+          <div class="chip pu"><span class="av">爸</span>爸爸</div>
+        </div>
+        <div class="gauge">
+          <div class="ripple" id="rp0"></div><div class="ripple" id="rp1"></div><div class="ripple" id="rp2"></div>
+          <div class="ticks" id="ticks0"></div>
+          <div class="ringwrap">
+            <svg viewBox="0 0 204 204">
+              <defs>
+                <linearGradient id="gA" x1="0" y1="1" x2="1" y2="0">
+                  <stop offset="0%" stop-color="#00F0FF"/><stop offset="55%" stop-color="#39FF88"/>
+                  <stop offset="100%" stop-color="#39FF88"/>
+                </linearGradient>
+                <filter id="glow" x="-60%" y="-60%" width="220%" height="220%">
+                  <feGaussianBlur stdDeviation="7" result="b"/>
+                  <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+                </filter>
+              </defs>
+              <circle cx="102" cy="102" r="88" fill="none" stroke="rgba(29,44,78,.85)" stroke-width="10"/>
+              <circle id="arc0" cx="102" cy="102" r="88" fill="none" stroke="url(#gA)" stroke-width="10"
+                      stroke-linecap="round" transform="rotate(-90 102 102)" filter="url(#glow)"/>
+            </svg>
+            <div class="dot" id="dot0" style="transform:rotate(-90deg) translateY(-88px)"></div>
+          </div>
+          <div class="readout">
+            <div class="val"><span id="w0">0.00</span><small>kg</small></div>
+            <div class="unit">WEIGHT</div>
+            <div class="lock"><i></i>LOCKED · SEQ 37</div>
+          </div>
+        </div>
+        <div class="bmi" id="bmi0">
+          <div class="row"><span class="n">21.6</span><span class="k">BMI</span><span class="badge">正常</span></div>
+          <div class="scale4"><i class="on1"></i><i class="on2"></i><i></i><i></i></div>
+          <div class="legend"><span>偏瘦</span><span>正常</span><span>超重</span><span>肥胖</span></div>
+        </div>
+        <div class="trio">
+          <div><em>BODY FAT</em><b>16.6</b><span>%</span></div>
+          <div><em>BMR</em><b>1542</b><span>kcal</span></div>
+          <div><em>GOAL</em><b>65.0</b><span>kg</span></div>
+        </div>
+        <div class="tele">
+          <div class="h">BROADCAST TELEMETRY</div>
+          <div class="hexlines" id="hex0">
+            <div>CA 20 0B 12 12 12 12 01 05 25</div>
+            <div>1D 74 03 E8 E1 AA BB CC DD EE FF</div>
+            <div>SEQ 37 · RSSI -58 · R1 1000<span class="cur" id="cur"></span></div>
+          </div>
+          <div class="f"><span>PRODUCT 1212</span><span>TYPE 01</span><span>PROP 0x05</span></div>
+        </div>
+        <div class="tabbar"><span class="tb on"><b>◎</b><i>测量</i></span><span class="tb"><b>↗</b><i>趋势</i></span><span class="tb"><b>≡</b><i>档案</i></span><span class="tb"><b>◉</b><i>成员</i></span></div>
+      </div>
+    </div>
+
+    <!-- ============ 02 趋势 ============ -->
+    <div class="device" id="d1">
+      <div class="dlabel"><b>02</b>TREND<em>7D</em></div>
+      <div class="screen">
+        <div class="sline" id="sline1"></div>
+        <div class="status"><span>23:41</span><span>BLE · 5G · 82%</span></div>
+        <div class="topbar"><span class="a">NEON</span><span class="b">//</span><span>SCALE</span><i class="led"></i></div>
+        <div class="tabs"><span class="tab" id="t1a">7D</span><span class="tab on" id="t1b">30D</span><span class="tab" id="t1c">365D</span></div>
+        <div class="chart">
+          <svg viewBox="0 0 300 212" preserveAspectRatio="none">
+            <defs>
+              <linearGradient id="gL" x1="0" y1="1" x2="0" y2="0">
+                <stop offset="0%" stop-color="rgba(0,240,255,0)"/>
+                <stop offset="100%" stop-color="rgba(0,240,255,.28)"/>
+              </linearGradient>
+              <linearGradient id="gS" x1="0" y1="0" x2="1" y2="0">
+                <stop offset="0%" stop-color="#00F0FF"/><stop offset="60%" stop-color="#39FF88"/>
+                <stop offset="100%" stop-color="#39FF88"/>
+              </linearGradient>
+              <filter id="glow2" x="-40%" y="-40%" width="180%" height="180%">
+                <feGaussianBlur stdDeviation="5" result="b"/>
+                <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+              </filter>
+            </defs>
+            <line x1="0" y1="52" x2="300" y2="52" stroke="rgba(255,176,32,.45)" stroke-width="1" stroke-dasharray="5 5"/>
+            <text x="6" y="46" fill="rgba(255,176,32,.8)" font-family="Consolas" font-size="8">GOAL 65.0</text>
+            <path id="area1" d="M18 96 L64 84 L110 90 L156 66 L202 58 L248 50 L286 44 L286 200 L18 200 Z" fill="url(#gL)" opacity="0"/>
+            <path id="line1" d="M18 96 L64 84 L110 90 L156 66 L202 58 L248 50 L286 44"
+                  fill="none" stroke="url(#gS)" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" filter="url(#glow2)"/>
+            <circle id="p1" cx="286" cy="44" r="4" fill="#39FF88" filter="url(#glow2)"/>
+          </svg>
+          <span class="glab" style="left:8px;bottom:6px">11-05</span>
+          <span class="glab" style="right:8px;bottom:6px">11-11</span>
+        </div>
+        <div class="stat">
+          <div><em>Δ 7D</em><b>-1.40</b></div>
+          <div><em>AVG</em><b>63.0</b></div>
+          <div><em>COUNT</em><b>7</b></div>
+        </div>
+        <div class="note">目标进度 <b>68%</b> · 起始 66.8 → 目标 65.0<br>数据全部来自本地 Room，无云端同步</div>
+        <div class="tabbar"><span class="tb"><b>◎</b><i>测量</i></span><span class="tb on"><b>↗</b><i>趋势</i></span><span class="tb"><b>≡</b><i>档案</i></span><span class="tb"><b>◉</b><i>成员</i></span></div>
+      </div>
+    </div>
+
+    <!-- ============ 03 档案 ============ -->
+    <div class="device" id="d2">
+      <div class="dlabel"><b>03</b>RECORDS<em>32</em></div>
+      <div class="screen">
+        <div class="sline" id="sline2"></div>
+        <div class="status"><span>23:41</span><span>BLE · 5G · 82%</span></div>
+        <div class="topbar"><span class="a">NEON</span><span class="b">//</span><span>SCALE</span><i class="led"></i></div>
+        <div class="sumrow">
+          <div><em>TIMES</em><b>32</b></div>
+          <div><em>LATEST</em><b>62.40</b></div>
+          <div><em>AVG</em><b>63.12</b></div>
+        </div>
+        <div class="rec" id="r0"><span class="d">11-11</span><span class="w">62.40<span>kg</span></span><span class="b">正常</span><span class="arn">›</span></div>
+        <div class="rec" id="r1"><span class="d">11-10</span><span class="w">62.70<span>kg</span></span><span class="b">正常</span><span class="arn">›</span></div>
+        <div class="rec" id="r2"><span class="d">11-09</span><span class="w">63.10<span>kg</span></span><span class="b">正常</span><span class="arn">›</span></div>
+        <div class="rec hl" id="r3"><span class="d">11-08</span><span class="w">62.90<span>kg</span></span><span class="b">正常</span><span class="arn">›</span></div>
+        <div class="rec" id="r4"><span class="d">11-07</span><span class="w">63.42<span>kg</span></span><span class="b">正常</span><span class="arn">›</span></div>
+        <div class="rec" id="r5"><span class="d">11-06</span><span class="w">63.28<span>kg</span></span><span class="b">正常</span><span class="arn">›</span></div>
+        <div class="rec" id="r6"><span class="d">11-05</span><span class="w">63.55<span>kg</span></span><span class="b">正常</span><span class="arn">›</span></div>
+        <div class="detail" id="det">
+          <div class="dh">BODY METRICS · ESTIMATED</div>
+          <div class="grid2">
+            <div><span>BMI</span><b>21.59</b></div><div><span>体脂率</span><b>16.6%</b></div>
+            <div><span>BMR</span><b>1542</b></div><div><span>IBW</span><b>65.8</b></div>
+            <div><span>LBM</span><b>52.0</b></div><div><span>FM</span><b>10.4</b></div>
+            <div><span>相对体重</span><b>94.8</b></div><div><span>肥胖度</span><b>-5.2%</b></div>
+          </div>
+          <div class="dis">公式估算 · 非秤体实测 · 不作医学诊断</div>
+        </div>
+        <div class="tabbar"><span class="tb"><b>◎</b><i>测量</i></span><span class="tb"><b>↗</b><i>趋势</i></span><span class="tb on"><b>≡</b><i>档案</i></span><span class="tb"><b>◉</b><i>成员</i></span></div>
+      </div>
+    </div>
+
+    <!-- ============ 04 成员 ============ -->
+    <div class="device" id="d3">
+      <div class="dlabel"><b>04</b>PROFILES<em>3</em></div>
+      <div class="screen">
+        <div class="sline" id="sline3"></div>
+        <div class="status"><span>23:41</span><span>BLE · 5G · 82%</span></div>
+        <div class="topbar"><span class="a">NEON</span><span class="b">//</span><span>SCALE</span><i class="led"></i></div>
+        <div class="ucard on" id="u0"><span class="big">我</span><span class="info"><b>本人</b><em>男 · 30 岁 · 170cm</em></span><span class="tag2">目标 65.0</span></div>
+        <div class="ucard mg" id="u1"><span class="big">太</span><span class="info"><b>太太</b><em>女 · 28 岁 · 162cm</em></span><span class="tag2">目标 52.0</span></div>
+        <div class="ucard pu" id="u2"><span class="big">爸</span><span class="info"><b>爸爸</b><em>男 · 58 岁 · 172cm</em></span><span class="tag2">目标 70.0</span></div>
+        <div class="unitrow"><span class="unit on">KG</span><span class="unit">斤</span><span class="unit">LB</span></div>
+        <div class="addbtn">＋ 新增成员</div>
+        <div class="devbox">
+          <div><span>DEVICE</span><b>KTZC-1804W-T</b></div>
+          <div><span>PROTOCOL</span><b>0x20CA · BLE ADV</b></div>
+          <div><span>STORAGE</span><b>ROOM · LOCAL ONLY</b></div>
+          <div><span>SDK</span><b>0 THIRD-PARTY</b></div>
+        </div>
+        <div class="devbox" style="margin-top:8px">
+          <div><span>TOTAL RECORDS</span><b>96</b></div>
+          <div><span>DB SIZE</span><b>412 KB</b></div>
+        </div>
+        <div class="note">多人档案 · 一对多记录<br>保存后可 5 秒内「改归属」</div>
+        <div class="tabbar"><span class="tb"><b>◎</b><i>测量</i></span><span class="tb"><b>↗</b><i>趋势</i></span><span class="tb"><b>≡</b><i>档案</i></span><span class="tb on"><b>◉</b><i>成员</i></span></div>
+      </div>
+    </div>
+
+  </div>
+
+  <div id="foot"><span>KOTLIN</span><i>·</i><span>JETPACK COMPOSE</span><i>·</i><span>ROOM</span><i>·</i><span>PURE BLE</span><i>·</i><span>OFFLINE</span></div>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+const clamp = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v));
+const seg = (t, a, b) => clamp((t - a) / (b - a));
+const out = x => 1 - Math.pow(1 - x, 3);
+const inout = x => x < .5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
+const DUR = 11.8;
+
+// logo 逐字
+const LOGO = [
+  { c: 'N', cls: 'a' }, { c: 'E', cls: 'a' }, { c: 'O', cls: 'a' }, { c: 'N', cls: 'a' },
+  { c: '/', cls: 'b' }, { c: '/', cls: 'b' },
+  { c: 'S', cls: '' }, { c: 'C', cls: '' }, { c: 'A', cls: '' }, { c: 'L', cls: '' }, { c: 'E', cls: '' }
+];
+$('logo').innerHTML = LOGO.map(o => `<span class="ch ${o.cls}">${o.c}</span>`).join('');
+const chs = [...document.querySelectorAll('#logo .ch')];
+
+// 折线长度
+const line1 = $('line1');
+const L1 = line1.getTotalLength();
+line1.style.strokeDasharray = L1;
+line1.style.strokeDashoffset = L1;
+
+// 圆环
+const R = 88, C = 2 * Math.PI * R;
+const arc0 = $('arc0');
+arc0.style.strokeDasharray = C;
+
+// 波纹 3 个
+const rps = [$('rp0'), $('rp1'), $('rp2')];
+
+function renderFrame(t) {
+  // ---- 背景 ----
+  $('grid').style.opacity = seg(t, .10, .95) * .95;
+  $('g1').style.opacity = seg(t, .05, 1.0) * .85;
+  $('g2').style.opacity = seg(t, .12, 1.2) * .8;
+  const sc = ((t * 0.135) % 1);
+  $('scan').style.opacity = seg(t, 1.0, 1.7) * .95;
+  $('scan').style.top = (-280 + sc * 1520) + 'px';
+  document.querySelectorAll('.hud').forEach((h, i) => h.style.opacity = seg(t, .3 + i * .06, .9 + i * .06) * .8);
+
+  // ---- 标题 ----
+  chs.forEach((c, i) => {
+    const p = seg(t, .14 + i * .035, .30 + i * .035);
+    c.style.opacity = p;
+    c.style.transform = `translateY(${(1 - out(p)) * 26}px)`;
+  });
+  $('tagline').style.opacity = seg(t, .55, .85);
+  $('tagline').style.letterSpacing = (7 + (1 - out(seg(t, .55, .95))) * 10) + 'px';
+  $('sub').style.opacity = seg(t, .62, .92);
+
+  // ---- 设备入场 ----
+  for (let i = 0; i < 4; i++) {
+    const p = out(seg(t, 1.14 + i * .09, 1.74 + i * .09));
+    const d = $('d' + i);
+    d.style.opacity = p;
+    d.style.transform = `translateY(${(1 - p) * 96}px)`;
+  }
+
+  // ---- 扫描线（各屏）----
+  for (let i = 0; i < 4; i++) {
+    const ph = ((t * .34 + i * .21) % 1);
+    const el = $('sline' + i);
+    el.style.top = (-80 + ph * 780) + 'px';
+    el.style.opacity = .85 * seg(t, 2.0, 2.6);
+  }
+
+  // ---- 01 测量 ----
+  const gp = out(seg(t, 2.05, 3.55));         // 圆环
+  const ringP = gp * 0.68;
+  arc0.style.strokeDashoffset = C * (1 - ringP);
+  $('dot0').style.transform = `rotate(${-90 + ringP * 360}deg) translateY(-88px)`;
+  $('dot0').style.opacity = gp > .02 ? 1 : 0;
+  $('ticks0').style.transform = `rotate(${t * 16}deg)`;
+
+  const wp = out(seg(t, 2.15, 3.4));
+  $('w0').textContent = (62.40 * wp).toFixed(2);
+
+  // 波纹（锁定后循环）
+  const rbase = seg(t, 3.35, 3.6);
+  rps.forEach((el, i) => {
+    const ph = ((t - 3.35) / 2.6 + i / 3) % 1;
+    const on = t > 3.35 ? rbase : 0;
+    el.style.opacity = on * Math.max(0, 1 - ph) * .55;
+    el.style.transform = `scale(${.22 + ph * 1.05})`;
+  });
+
+  const bp = out(seg(t, 3.35, 3.85));
+  const bmi0 = $('bmi0');
+  bmi0.style.opacity = bp;
+  bmi0.style.transform = `translateY(${(1 - bp) * 16}px)`;
+
+  // hex 光标闪烁
+  $('cur').style.opacity = (Math.sin(t * 7) > 0) ? 1 : 0.12;
+
+  // ---- 02 趋势 ----
+  const lp = out(seg(t, 2.25, 4.25));
+  line1.style.strokeDashoffset = L1 * (1 - lp);
+  $('area1').style.opacity = seg(t, 3.4, 4.4) * .9;
+  $('p1').style.opacity = lp > .96 ? 1 : 0;
+  $('p1').setAttribute('r', 4 + Math.sin(t * 6) * 1.2);
+
+  // ---- 03 档案 ----
+  for (let i = 0; i < 7; i++) {
+    const p = out(seg(t, 2.42 + i * .11, 2.84 + i * .11));
+    const el = $('r' + i);
+    el.style.opacity = 1;
+    el.style.transform = `translateX(${(1 - p) * -14}px)`;
+  }
+  const dp = out(seg(t, 4.35, 4.85));
+  $('det').style.opacity = dp;
+  $('det').style.transform = `translateY(${(1 - dp) * 16}px)`;
+
+  // ---- 04 成员 ----
+  for (let i = 0; i < 3; i++) {
+    const p = out(seg(t, 2.6 + i * .14, 3.04 + i * .14));
+    const el = $('u' + i);
+    el.style.opacity = 1;
+    el.style.transform = `translateY(${(1 - p) * 10}px)`;
+  }
+
+  // ---- 镜头推近 ----
+  const zoom = inout(seg(t, 5.15, 5.95)) * (1 - inout(seg(t, 8.55, 9.2)));
+  const s = 1 + 0.46 * zoom;
+  const dx = 570 * zoom;      // 4 台总宽 1480，d0 中心距 board 中心 570
+  $('d0').style.transform =
+    `translateY(${(1 - out(seg(t, 1.14, 1.74))) * 96 * (1 - Math.min(1, zoom * 4))}px)` +
+    ` translate(${dx}px, 0) scale(${s})`;
+  $('d0').style.zIndex = zoom > .02 ? 20 : 1;
+
+  // 全景层整体轻推
+  $('board').style.transform = `translateX(-50%) scale(${1 + 0.012 * inout(seg(t, 5.15, 9.2))})`;
+  for (let i = 1; i < 4; i++) {
+    $('d' + i).style.opacity = out(seg(t, 1.14 + i * .09, 1.74 + i * .09)) * (1 - zoom * .96);
+  }
+  // 标题：开场居中放大，手机入场前归位到左上
+  const hs = 1 - inout(seg(t, .72, 1.12));
+  $('head').style.opacity = 1 - zoom;
+  $('head').style.transform =
+    `translate(${664 * hs}px, ${400 * hs}px) scale(${1 + 0.2 * hs})`;
+
+  // ---- 页脚 ----
+  const fp = out(seg(t, 9.3, 9.85));
+  $('foot').style.opacity = fp;
+  $('foot').style.transform = `translateY(${(1 - fp) * 14}px)`;
+
+  // ---- 收尾呼吸 ----
+  const br = seg(t, 9.9, 11.8);
+  $('stage').style.filter = `brightness(${1 + 0.05 * Math.sin(br * Math.PI)})`;
+}
+
+window.renderFrame = renderFrame;
+window.DURATION = DUR;
+
+// 便于人工预览：?t=3.2 定格
+const q = new URLSearchParams(location.search);
+renderFrame(q.has('t') ? parseFloat(q.get('t')) : 0);
+if (q.has('play')) {
+  const t0 = performance.now();
+  const loop = () => {
+    const t = ((performance.now() - t0) / 1000) % DUR;
+    renderFrame(t);
+    requestAnimationFrame(loop);
+  };
+  loop();
+}
+</script>
+</body>
+</html>
