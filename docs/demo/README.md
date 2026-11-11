@@ -6,7 +6,8 @@
 
 | 文件 | 规格 | 用途 |
 |---|---|---|
-| `neon-scale-demo.gif` | 720×405 · 10 fps · 4.7 MB · 11.8 s 循环 | **README 顶部直接嵌入**（经 jsDelivr CDN 加速，国内可加载） |
+| `screenshot.png` | 1920×1080 · PNG · 1.0 MB | **README 顶部展示图**（视频 3.5s 处的四屏总览帧，加载快） |
+| `neon-scale-demo.gif` | 720×405 · 10 fps · 4.7 MB · 11.8 s 循环 | 动态演示（经 jsDelivr CDN 引用，国内可加载） |
 | `neon-scale-demo.mp4` | 1920×1080 · 30 fps · 3.8 MB · H.264 | 高清分享、社交平台、Release 附件 |
 | `poster-wide.png` | 1920×1080 | 四屏全景海报；适合设为 GitHub 仓库 Social preview |
 | `poster-measure.png` | 1920×1080 | 测量页特写海报 |
