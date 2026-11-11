@@ -63,7 +63,7 @@ Windows 用 `copy local.properties.example local.properties` 和 `gradlew.bat as
 | [docs/design-history/](docs/design-history/) | 初版 UI 重设计方案（**历史资料，非当前视觉**） |
 | [CHANGELOG.md](CHANGELOG.md) · [CONTRIBUTING.md](CONTRIBUTING.md) | 版本记录 · 参与开发 |
 
-[docs/preview.html](docs/preview.html) 是四屏视觉 / 动效交互预览（单文件、无外部依赖）：**下载后本地用浏览器打开**，或按 [07 文档](docs/07-publish-to-github.md) 启用 GitHub Pages 在线访问。
+[docs/preview.html](docs/preview.html) 是四屏视觉 / 动效交互预览（单文件、无外部依赖）：**下载后本地用浏览器打开**，或访问 [GitHub Pages 在线预览](https://edwardqoq.github.io/CyberScale/)。
 
 ---
 
