@@ -6,12 +6,12 @@
 
 | 文件 | 规格 | 用途 |
 |---|---|---|
-| `neon-scale-demo.gif` | 720×405 · 12 fps · 6.1 MB · 11.8 s 循环 | **README 顶部直接嵌入**，GitHub 会自动播放 |
+| `neon-scale-demo.gif` | 720×405 · 10 fps · 4.7 MB · 11.8 s 循环 | **README 顶部直接嵌入**（经 jsDelivr CDN 加速，国内可加载） |
 | `neon-scale-demo.mp4` | 1920×1080 · 30 fps · 3.8 MB · H.264 | 高清分享、社交平台、Release 附件 |
 | `poster-wide.png` | 1920×1080 | 四屏全景海报；适合设为 GitHub 仓库 Social preview |
 | `poster-measure.png` | 1920×1080 | 测量页特写海报 |
 
-> GIF 已针对 GitHub 优化：720px 宽 + 12fps + 128 色 + Bayer 抖动。再放大或提帧率体积会翻倍（900px/14fps 版本约 15.8 MB，加载明显变慢）。
+> GIF 已针对 GitHub 优化：720px 宽 + 10fps + 96 色 + Bayer 抖动，体积约 4.7 MB。GitHub 的 README 图片代理（camo）对超过约 5 MB 的外部图片抓取会失败，因此不要再放大尺寸/帧率（原始 720px/12fps 版本 6.1 MB 会加载失败）。README 中通过 `gcore.jsdelivr.net` CDN 引用，国内网络可直接加载。
 
 ## 分镜
 
@@ -38,9 +38,9 @@ ffmpeg -y -framerate 30 -i frames/f_%04d.png \
   -c:v libx264 -preset slow -crf 18 -pix_fmt yuv420p -movflags +faststart \
   docs/demo/neon-scale-demo.mp4
 
-# 3. 压 GIF
+# 3. 压 GIF（720px / 10fps / 96 色，控制在 5 MB 以内）
 ffmpeg -y -i docs/demo/neon-scale-demo.mp4 \
-  -vf "fps=12,scale=720:-1:flags=lanczos,split[a][b];[a]palettegen=max_colors=128:stats_mode=diff[p];[b][p]paletteuse=dither=bayer:bayer_scale=4:diff_mode=rectangle" \
+  -vf "fps=10,scale=720:-1:flags=lanczos,split[a][b];[a]palettegen=max_colors=96:stats_mode=diff[p];[b][p]paletteuse=dither=bayer:bayer_scale=4:diff_mode=rectangle" \
   docs/demo/neon-scale-demo.gif
 ```
 
