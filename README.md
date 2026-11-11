@@ -9,7 +9,7 @@
 ![version](https://img.shields.io/badge/version-1.1.0-00F0FF)
 ![License](https://img.shields.io/badge/License-Apache_2.0-blue)
 
-![NEON//SCALE 四屏动态演示](https://gcore.jsdelivr.net/gh/edwardqoq/CyberScale@main/docs/demo/neon-scale-demo.gif)
+![NEON//SCALE 四屏动态演示](https://gcore.jsdelivr.net/gh/edwardqoq/CyberScale@main/docs/demo/neon-scale-demo.gif?v=2)
 
 <p align="center"><sub>12 秒演示 · 画面由真实界面代码渲染 · <a href="https://gcore.jsdelivr.net/gh/edwardqoq/CyberScale@main/docs/demo/neon-scale-demo.mp4">下载 1080p 版本</a> · <a href="docs/demo/README.md">素材说明</a></sub></p>
 
