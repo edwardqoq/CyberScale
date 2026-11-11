@@ -1,0 +1,46 @@
+# NEON//SCALE — Git 忽略规则
+# 原则：只提交源码、配置模板与文档；凡「本机生成 / 含本机路径 / 大二进制」一律排除。
+
+# ---- Android Studio / IntelliJ ----
+*.iml
+.idea/
+.gradle/
+/local.properties
+captures/
+.externalNativeBuild
+.cxx/
+.kotlin/
+misc.xml
+deploymentTargetDropDown.xml
+render.experimental.xml
+
+# ---- 构建产物（本地保留，不入库）----
+build/
+*/build/
+app/build/
+*.class
+*.dex
+
+# ---- 安装包与签名材料（绝不入库，走 GitHub Releases）----
+*.apk
+*.ap_
+*.aab
+*.jks
+*.keystore
+*.pepk
+releases/*.apk
+
+# ---- 本机 / 编辑器临时文件 ----
+.DS_Store
+Thumbs.db
+desktop.ini
+*.swp
+*~
+*.log
+
+# ---- 工具与脚本缓存 ----
+.workbuddy/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/

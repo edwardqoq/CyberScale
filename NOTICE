@@ -1,0 +1,15 @@
+NEON//SCALE (CyberScale)
+Copyright 2026 The NEON//SCALE Authors
+
+This product is licensed under the Apache License, Version 2.0 (see LICENSE).
+
+The BLE broadcast frame layout described in docs/03-BLE广播协议.md was derived
+from the author's own earlier in-house reference project. No third-party SDK,
+no vendor SDK, and no reverse-engineered proprietary library code is included.
+
+All third-party dependencies are declared in app/build.gradle.kts and are
+obtained from Google Maven / Maven Central under their own licenses.
+
+Body-composition values are computed from published population-level formulas
+(Deurenberg, Mifflin-St Jeor, Devine). They are estimates, not measurements,
+and are not intended for medical diagnosis. See docs/04-身体指标与数据库.md.

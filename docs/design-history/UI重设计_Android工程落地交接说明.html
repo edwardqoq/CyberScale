@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>UI 重设计 v2 → Android 工程落地交接说明</title>
+<style>
+:root{--blue:#014DB2;--blue2:#004CB2;--navy:#001745;--green:#10B981;--amber:#F59E0B;
+--ink:#0A1628;--muted:#6B7280;--faint:#9AA3B2;--line:#E6EBF1;--bg:#F6F8FA;--card:#FFFFFF}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+font-family:"Noto Sans SC","PingFang SC","Microsoft YaHei",system-ui,sans-serif;
+font-size:14px;line-height:1.75;-webkit-font-smoothing:antialiased}
+.cover{background:linear-gradient(135deg,#004CB2 0%,#001745 100%);color:#fff;padding:72px 8vw 64px;position:relative;overflow:hidden}
+.cover:after{content:"";position:absolute;width:520px;height:520px;border-radius:50%;
+right:-140px;top:-220px;background:radial-gradient(circle,rgba(52,211,153,.28),transparent 68%)}
+.cover .kicker{font:600 12px/1 Inter,"Noto Sans SC",sans-serif;letter-spacing:.22em;color:#5EE3B0}
+.cover h1{font-size:42px;line-height:1.28;margin:22px 0 8px;font-weight:800;letter-spacing:-.5px}
+.cover h2{font-size:24px;font-weight:500;margin:0;color:#B9D2F0;letter-spacing:.08em}
+.cover p{color:#A8C4E8;margin-top:20px;font-size:14px}
+.cover .tags{margin-top:28px;display:flex;gap:10px;flex-wrap:wrap}
+.cover .tags span{border:1px solid rgba(255,255,255,.28);border-radius:999px;
+padding:5px 14px;font-size:12px;color:#DCEBFA;background:rgba(255,255,255,.06)}
+.layout{display:grid;grid-template-columns:220px minmax(0,1fr);gap:0;max-width:1280px;margin:0 auto}
+nav{position:sticky;top:0;align-self:start;padding:36px 20px 40px 0;font-size:12.5px}
+nav .nt{font-size:11px;letter-spacing:.16em;color:var(--faint);font-weight:700;margin-bottom:14px}
+nav a{display:block;color:var(--muted);text-decoration:none;padding:6px 10px;border-left:2px solid transparent}
+nav a:hover{color:var(--blue);border-left-color:var(--green);background:#fff}
+main{padding:36px 0 80px;min-width:0}
+section{background:var(--card);border:1px solid var(--line);border-radius:18px;
+padding:30px 34px;margin-bottom:20px;box-shadow:0 4px 20px rgba(10,30,60,.035)}
+h3{font-size:21px;margin:0 0 6px;font-weight:700;letter-spacing:-.2px}
+h3 .num{color:var(--blue);font:800 13px/1 Inter,sans-serif;letter-spacing:.1em;margin-right:10px;vertical-align:3px}
+.sub{color:var(--faint);font-size:12.5px;margin:0 0 22px}
+h4{font-size:15px;margin:26px 0 10px;color:var(--blue);font-weight:700}
+p{margin:0 0 12px}
+.muted{color:var(--muted)}
+table{width:100%;border-collapse:collapse;font-size:12.5px;margin:14px 0 6px}
+th{background:var(--blue);color:#fff;text-align:left;padding:10px 12px;font-weight:600;font-size:12px}
+td{padding:9px 12px;border-bottom:1px solid var(--line);vertical-align:top;color:#33415C}
+tr:nth-child(even) td{background:#F8FAFC}
+tr:hover td{background:#EFF6FF}
+.mono{font-family:Inter,"SFMono-Regular",Consolas,monospace;font-size:12px;white-space:nowrap}
+.palette{display:grid;grid-template-columns:repeat(auto-fill,minmax(168px,1fr));gap:12px;margin:18px 0 4px}
+.sw{border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#fff}
+.sw i{display:block;height:52px}
+.sw div{padding:8px 10px 10px}
+.sw b{display:block;font-size:12px;font-weight:600}
+.sw small{color:var(--faint);font-size:11px;display:block;margin-top:2px}
+.strategy{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin-top:16px}
+.strategy div{border:1px solid var(--line);border-radius:14px;padding:16px 18px;background:#FAFCFF}
+.strategy b{display:block;color:var(--blue);font-size:14px;margin-bottom:6px}
+.strategy span{font-size:12.5px;color:var(--muted)}
+.note{border-left:3px solid var(--amber);background:#FFF8EC;padding:12px 16px;border-radius:0 10px 10px 0;
+font-size:12.5px;color:#7C4A03;margin-top:18px}
+.good{border-left-color:var(--green);background:#EAF8F2;color:#1F6B52}
+.screen{display:grid;grid-template-columns:minmax(0,1fr) 210px;gap:24px;align-items:start;margin-top:18px}
+.screen img{width:100%;border-radius:14px;border:1px solid var(--line);
+box-shadow:0 10px 30px rgba(10,30,60,.12);display:block}
+.screen .side{font-size:12.5px;color:var(--muted)}
+.screen .side b{display:block;color:var(--blue);font-size:13px;margin-bottom:6px}
+.screen .side p{margin-bottom:14px}
+.gallery{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:16px}
+.gallery figure{margin:0}
+.gallery img{width:100%;border-radius:12px;border:1px solid var(--line);box-shadow:0 6px 20px rgba(10,30,60,.10)}
+.gallery figcaption{text-align:center;font-size:12px;color:var(--muted);margin-top:8px}
+ul{margin:8px 0 12px;padding-left:20px}li{margin-bottom:7px;font-size:13px}
+.tag{display:inline-block;font-size:11px;font-weight:700;padding:2px 9px;border-radius:6px;
+background:#EDF4FF;color:var(--blue);margin-right:8px}
+.tag.warn{background:#FFF3DC;color:#B45309}
+footer{text-align:center;color:var(--faint);font-size:12px;padding:0 0 50px}
+@media(max-width:900px){.layout{grid-template-columns:1fr}nav{display:none}main{padding:20px}
+section{padding:22px}.cover h1{font-size:30px}.screen{grid-template-columns:1fr}
+.gallery{grid-template-columns:repeat(2,1fr)}}
+@media print{nav{display:none}.layout{display:block}section{break-inside:avoid;box-shadow:none}}
+</style><style>
+pre{background:#0F1B2D;color:#D6E7FA;padding:16px 18px;border-radius:12px;overflow-x:auto;
+font:12px/1.6 Consolas,"SFMono-Regular",monospace;margin:12px 0 18px;white-space:pre}
+pre .c{color:#7FAEE0}.warnbox{background:#FFF7E8;border-left:3px solid #F59E0B;color:#7C4A03;
+padding:14px 18px;border-radius:0 10px 10px 0;font-size:13px;margin:16px 0}
+.contract{background:#F8FAFC;border:1px dashed #BBD2EC;border-radius:10px;padding:12px 16px;
+font:12px/1.8 Consolas,monospace;color:#33415C;word-break:break-all}
+.chk{list-style:none;padding-left:0}.chk li{padding-left:24px;position:relative;font-size:13px}
+.chk li:before{content:"☐";position:absolute;left:0;color:#014DB2;font-size:15px}
+.step{display:flex;gap:12px;align-items:flex-start;margin-bottom:10px;font-size:13px}
+.step b{background:#014DB2;color:#fff;border-radius:6px;padding:1px 8px;font-size:11px;white-space:nowrap;margin-top:2px}
+</style></head><body>
+<header class="cover"><div class="kicker">ENGINEERING HANDOFF · V1.0</div>
+<h1>UI 重设计 v2<br>Android 工程落地交接说明</h1>
+<h2>设计侧 → 开发侧　·　含数据源冲突与 ID 契约</h2>
+<p>不改业务逻辑 · 保留控件 ID · 无数据源字段诚实降级</p>
+<div class="tags"><span>2026.11.11</span><span>原生 Android / Java</span><span>aapt2 手工构建</span>
+<span>4 个 Fragment</span><span>待开发接手</span></div></header>
+<div class="layout"><nav><div class="nt">CONTENTS</div>
+<a href="#s1">01 工程现状速查</a><a href="#s2">02 ⚠ 数据源冲突</a>
+<a href="#s3">03 设计 Token 落位</a><a href="#s4">04 全局框架与 ID 契约</a>
+<a href="#s5">05 四屏改造清单</a><a href="#s6">06 分阶段落地</a>
+<a href="#s7">07 构建与验收</a><a href="#s8">08 开放问题</a>
+<a href="#s9">附录 交付物索引</a></nav><main><section id="s1"><h3><span class="num">01</span>工程现状速查</h3><p class="sub">Project Snapshot</p><table><thead><tr><th>项目</th><th>现状</th></tr></thead><tbody><tr><td>工程路径（交接副本）</td><td>［本机桌面副本］/youwo_app</td></tr><tr><td>工程路径（build.sh 指向）</td><td>［构建机工程］/youwo_app</td></tr><tr><td>构建脚本</td><td>build.sh · 7 步：aapt2 compile → link → javac → d8 → 打包 dex → zipalign → apksigner</td></tr><tr><td>工具链</td><td>Android SDK build-tools 37.0.0 / platform android-34 / JDK 21 / min-api 23 / Java 8 源码级别</td></tr><tr><td>主题</td><td>@style/AppTheme，parent = Theme.Material.Light.NoActionBar；无 AppCompat，不能用 app:srcCompat</td></tr><tr><td>现有主色</td><td>@color/mainColor = #FF52C3F2（高饱和青），本次需收敛为深蓝 #014DB2</td></tr><tr><td>现有涨跌色</td><td>record_up #FFF06978（红）/ record_dwon #FF50CDA5（绿），与设计稿语义相近但色值不同</td></tr><tr><td>已有自定义 View</td><td>com.youwo.scale.ui.LineChartView（趋势页折线图，可扩展面积渐变与末点高亮）</td></tr></tbody></table><div class="warnbox"><strong>⚠ 构建路径坑（务必先读）　</strong>build.sh 第 6 行 PROJ=&quot;［构建机工程］/youwo_app&quot; 为硬编码路径，且脚本开头 cd &quot;$PROJ&quot;。若在桌面副本上改代码再执行 build.sh，构建的是 E 盘旧工程，改动不会进 APK。开发前必须二选一：① 统一在 ［构建机工程］/youwo_app 改；② 把 PROJ 改为脚本所在目录（PROJ=&quot;$(cd &quot;$(dirname &quot;$0&quot;)&quot; &amp;&amp; pwd)&quot;）并在副本构建。构建完成后用 apk 内 resources.arsc 或安装后界面确认改动确实生效。</div></section><section id="s2"><h3><span class="num">02</span>⚠ 必须先决策：设计稿与真实数据源的冲突</h3><p class="sub">Data Source Audit — 最重要的一节</p><p>设计稿是「有数据的理想态」，用于评审信息架构；工程落地时必须逐项核对数据来源。下表按「可直接落地 / 需新增逻辑 / 需改文案 / 无数据源」四类给出结论。</p><table><thead><tr><th>设计稿元素</th><th>工程真实数据源</th><th>结论</th><th>落地要求</th></tr></thead><tbody><tr><td>当前体重 62.4 kg</td><td>ScaleDb.Record.weight（广播帧可得）</td><td>可直接落地</td><td>valueText 已有绑定；仅改字号/字重/颜色</td></tr><tr><td>今天 07:42 · 已同步</td><td>SQLite 本地记录时间 r.time()</td><td>文案需改</td><td>本 App 无云端，改「今天 07:42 · 已记录」</td></tr><tr><td>标准 · BMI 21.8</td><td>身高存于 KV（MeFragment btnHeight），体重已知</td><td>需新增计算</td><td>BMI = weight / (height_m)²；身高未填时显示「补全身高后查看」</td></tr><tr><td>距上次 -0.3 kg</td><td>db.list() 相邻记录，DynamicFragment 已有计算</td><td>可直接落地</td><td>改白卡 + 薄荷绿数值；沿用现有 lastWeightValue / lastWeightTime</td></tr><tr><td>30 天最佳 61.8 kg</td><td>db.best()，已有</td><td>可直接落地</td><td>现逻辑显示的是「与最佳值的差」，设计稿要显示最佳绝对值，需改文案与取值</td></tr><tr><td>目标进度 已完成 68%</td><td>db.goalWeight() + targetProgress</td><td>算法需重定义</td><td>现有 latest.weight / goal × 100 语义错误（超重时恒为 100%）。需定义起始体重 KV，按 (起始−当前)/(起始−目标) 计算，或改为「距目标还差 x kg」</td></tr><tr><td>体脂率 19.6%</td><td>ScaleDb.fat 字段存在，但广播帧不含身体成分，实际为 0</td><td>无数据源</td><td>显示「--」+「该秤型不支持体脂」说明，或直接隐藏该行；禁止填示例值</td></tr><tr><td>肌肉量 45.2 kg / 基础代谢 1428 kcal</td><td>muscle / bmr 字段同上，实际为 0</td><td>无数据源</td><td>同上降级；身体成分报告卡在无数据时收起</td></tr><tr><td>设备电量 82% / 已连接</td><td>BLE 不开放 GATT，无法读 0x2A19（README 已明确）</td><td>无数据源</td><td>改为「广播监听中 · 无需配对」，可接 BleManager 的扫描状态灯</td></tr><tr><td>7 天体重折线图</td><td>weightChart = LineChartView，数据源 db.list()</td><td>可落地</td><td>扩展面积渐变 shader + 末点高亮 + 轴标签；保留 weightChart ID</td></tr><tr><td>体脂柱状图 / 体脂率 19.6%</td><td>fatChart 存在但 fat 全为 0</td><td>无数据源</td><td>改为占位态「需支持 GATT 的秤型」或移除该卡，不要画假柱子</td></tr><tr><td>本周洞察 稳步下降</td><td>近 7 天 db.list() 可算</td><td>需新增逻辑</td><td>按首末差值生成文案；数据不足 2 条时隐藏该卡</td></tr><tr><td>统计概览 24 / 62.4 / 63.1</td><td>HistoryFragment 已有 totalCount / latestWeight / avgWeight</td><td>可直接落地</td><td>改三等分白卡 + 数字层级</td></tr><tr><td>记录流涨跌色</td><td>weightCompare 已有；现有色值红/绿</td><td>需统一色值</td><td>下降（向好）→ #10B981，上升 → #F59E0B；不使用红色</td></tr><tr><td>已坚持记录 24 天 · 连续 7 天</td><td>db.list() 可算</td><td>需新增逻辑</td><td>按记录日期去重统计总天数 + 连续天数</td></tr></tbody></table><div class="warnbox"><strong>红线：</strong>无数据源的字段一律显示「--」或占位说明，禁止把设计稿里的示例值写进代码或布局预览文本。</div></section><section id="s3"><h3><span class="num">03</span>设计 Token 落位</h3><p class="sub">Design Tokens → res/values &amp; res/drawable</p><h4>3.1　colors.xml 追加条目</h4><pre>&lt;!-- 追加到 res/values/colors.xml，不要删除旧条目（旧布局仍引用） --&gt;
+&lt;color name=&quot;brand_blue&quot;&gt;#FF014DB2&lt;/color&gt;
+&lt;color name=&quot;hero_gradient_start&quot;&gt;#FF004CB2&lt;/color&gt;
+&lt;color name=&quot;hero_gradient_end&quot;&gt;#FF001745&lt;/color&gt;
+&lt;color name=&quot;semantic_green&quot;&gt;#FF10B981&lt;/color&gt;
+&lt;color name=&quot;ring_green&quot;&gt;#FF34D399&lt;/color&gt;
+&lt;color name=&quot;bright_green_text&quot;&gt;#FF5EE3B0&lt;/color&gt;
+&lt;color name=&quot;semantic_amber&quot;&gt;#FFF59E0B&lt;/color&gt;
+&lt;color name=&quot;page_background&quot;&gt;#FFF6F8FA&lt;/color&gt;
+&lt;color name=&quot;card_background&quot;&gt;#FFFFFFFF&lt;/color&gt;
+&lt;color name=&quot;card_stroke&quot;&gt;#FFEAEAEA&lt;/color&gt;
+&lt;color name=&quot;track_grid&quot;&gt;#FFEDF1F5&lt;/color&gt;
+&lt;color name=&quot;insight_green_bg&quot;&gt;#FFEAF8F2&lt;/color&gt;
+&lt;color name=&quot;tip_blue_bg&quot;&gt;#FFEDF4FF&lt;/color&gt;
+&lt;color name=&quot;text_primary&quot;&gt;#FF0A1628&lt;/color&gt;
+&lt;color name=&quot;text_secondary&quot;&gt;#FF6B7280&lt;/color&gt;
+&lt;color name=&quot;text_tertiary&quot;&gt;#FF9AA3B2&lt;/color&gt;
+&lt;color name=&quot;record_row_bg&quot;&gt;#FFF6F9FC&lt;/color&gt;</pre><h4>3.2　drawable 示例（渐变 / 白卡 / 进度条）</h4><pre>&lt;!-- 示例：res/drawable/bg_hero_gradient.xml --&gt;
+&lt;shape xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;
+    android:shape=&quot;rectangle&quot;&gt;
+    &lt;gradient android:type=&quot;linear&quot; android:angle=&quot;270&quot;
+        android:startColor=&quot;@color/hero_gradient_start&quot;
+        android:endColor=&quot;@color/hero_gradient_end&quot; /&gt;
+    &lt;corners android:radius=&quot;24dp&quot; /&gt;
+&lt;/shape&gt;
+
+&lt;!-- 示例：res/drawable/bg_card_white.xml --&gt;
+&lt;shape xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;
+    android:shape=&quot;rectangle&quot;&gt;
+    &lt;solid android:color=&quot;@color/card_background&quot; /&gt;
+    &lt;stroke android:width=&quot;1dp&quot; android:color=&quot;@color/card_stroke&quot; /&gt;
+    &lt;corners android:radius=&quot;20dp&quot; /&gt;
+&lt;/shape&gt;
+
+&lt;!-- 示例：res/drawable/bg_progress_fill.xml（目标进度条） --&gt;
+&lt;shape xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;
+    android:shape=&quot;rectangle&quot;&gt;
+    &lt;gradient android:type=&quot;linear&quot; android:angle=&quot;0&quot;
+        android:startColor=&quot;@color/brand_blue&quot;
+        android:endColor=&quot;@color/semantic_green&quot; /&gt;
+    &lt;corners android:radius=&quot;4dp&quot; /&gt;
+&lt;/shape&gt;</pre><h4>3.3　需新增的 drawable 与自定义 View 清单</h4><table><thead><tr><th>文件</th><th>类型</th><th>用途</th></tr></thead><tbody><tr><td>bg_hero_gradient.xml</td><td>shape/gradient</td><td>Hero 仪表卡、个人信息卡、测量主按钮背景（圆角 24/22dp）</td></tr><tr><td>bg_card_white.xml</td><td>shape</td><td>通用白卡：白底 + #EAEAEA 1dp 描边 + 20dp 圆角</td></tr><tr><td>bg_card_white_18.xml</td><td>shape</td><td>指标双卡等 smaller card，圆角 18dp</td></tr><tr><td>bg_record_row.xml</td><td>shape</td><td>历史记录行 #F6F9FC + 14dp 圆角</td></tr><tr><td>bg_measure_btn.xml</td><td>shape/gradient</td><td>测量胶囊按钮，22dp 圆角 + 深蓝渐变</td></tr><tr><td>bg_tabbar_capsule.xml</td><td>shape</td><td>浮动导航白底 32dp 圆角；投影用 android:elevation 或 layer-list</td></tr><tr><td>bg_tab_active.xml</td><td>shape</td><td>导航激活项实心 #014DB2 / 26dp 圆角（selector 的 checked 态）</td></tr><tr><td>tab_item_bg_selector.xml</td><td>selector</td><td>按 state_checked 切换 bg_tab_active / 透明</td></tr><tr><td>bg_segment_track.xml</td><td>shape</td><td>周/月/年 轨道 #EDF1F5 + 20dp 圆角</td></tr><tr><td>bg_segment_active.xml</td><td>shape</td><td>激活项白底 16dp 圆角 + elevation 微投影</td></tr><tr><td>bg_progress_track.xml</td><td>shape</td><td>进度轨道 #EDF1F5 / 8dp</td></tr><tr><td>bg_progress_fill.xml</td><td>shape/gradient</td><td>进度填充 蓝→绿 / 8dp（scale drawable 或 ClipDrawable）</td></tr><tr><td>bg_insight_green.xml</td><td>shape</td><td>本周洞察卡 #EAF8F2 / 20dp</td></tr><tr><td>bg_tip_blue.xml</td><td>shape</td><td>数据小贴士卡 #EDF4FF / 20dp</td></tr><tr><td>bg_hero_bottom_strip.xml</td><td>shape</td><td>Hero 底部半透明指标条（#14FFFFFF + 12dp）</td></tr><tr><td>icon_*.xml（约 8 个）</td><td>vector</td><td>4 个 Tab 线性图标（统一 1.8dp 描边）、加号、右箭头、设备、洞察、时钟</td></tr><tr><td>tab_text_selector.xml</td><td>color state list</td><td>更新为 #FFFFFF（checked）/ #FF8A94A6（默认）</td></tr><tr><td>*_icon_selector.xml（4 个）</td><td>selector</td><td>由 mipmap 位图改为 vector state list，按 checked 换描边色</td></tr><tr><td>RingProgressView.java</td><td>自定义 View</td><td>环形进度仪表（140dp、9dp 描边、圆角端点）—— drawable 无法表达进度环，需自绘</td></tr><tr><td>BarChartView.java</td><td>自定义 View（可选）</td><td>体脂柱状图；若采纳「无数据降级」则可先不实现</td></tr></tbody></table><p class="muted">工程使用 Theme.Material.Light.NoActionBar，无 AppCompat，vector 图标请用 <span class="mono">android:src</span> 而非 <span class="mono">app:srcCompat</span>；aapt2 手工构建下新增资源后 R.java 会在 link 阶段重新生成，无需手动维护。</p></section><section id="s4"><h3><span class="num">04</span>全局框架改造与 ID 契约</h3><p class="sub">Global Shell &amp; ID Contract</p><table><thead><tr><th>部位</th><th>设计目标</th><th>开发要点</th></tr></thead><tbody><tr><td>系统状态栏</td><td>设计稿中的 9:41 假状态栏不要画进 App</td><td>用系统状态栏：windowLightStatusBar=true、statusBarColor=#F6F8FA，布局顶部留出状态栏高度</td></tr><tr><td>页头</td><td>去掉 #52C3F2 高饱和青顶栏，改为暖白底</td><td>保留 titleText / measureBtn ID；标题 22sp Bold #0A1628，日期 11sp #9AA3B2，右侧渐变胶囊测量按钮</td></tr><tr><td>测量主按钮</td><td>由纯文字升级为渐变胶囊 + 加号图标</td><td>保留 measureBtn ID 与 OnClickListener；用 bg_measure_btn + drawableStart vector 加号；四屏一致</td></tr><tr><td>底部导航</td><td>传统 50dp RadioGroup → 96dp 浮动胶囊（内部 62dp / 32dp 圆角）</td><td>必须保留 main_tab、dynamic_rb / trend_rb / history_rb / me_rb、bottomLayout、realtabcontent ID（MainActivity 绑定 OnCheckedChangeListener）；用 selector 背景实现激活态实心深蓝</td></tr><tr><td>内容区</td><td>左右 20dp、卡片间距 14dp</td><td>原布局的 16dp / 24dp 边距统一；ScrollView 内 LinearLayout 保持垂直排列</td></tr><tr><td>字体</td><td>中文 Noto Sans SC / 数字 Inter Tight</td><td>工程无自定义字体：中文用系统 sans；数字可放 res/font/inter_tight*.ttf 并用 android:fontFamily（min-api 23 支持），或退化为 sans + textStyle=bold</td></tr><tr><td>基准宽度</td><td>设计稿 390pt 宽，Android 常见 360dp</td><td>不要硬编码 390dp；用 match_parent + 权重 / ConstraintLayout 自适应，圆角与字号可按 1pt≈1dp 直接取</td></tr></tbody></table><h4>4.1　ID 契约总表（红线：不可删除或改名）</h4><p class="muted">现有 Java 用 findViewById 直接绑定，删 ID 会编译失败或运行时空指针。重排布局时逐项核对。</p><p style="margin:10px 0 2px"><strong class="mono">activity_main.xml</strong></p><div class="contract">rootLayout, main_tab, titleText, measureBtn, realtabcontent, bottomLayout, dynamic_rb, trend_rb, history_rb, me_rb</div><p style="margin:10px 0 2px"><strong class="mono">fragment_dynamic.xml</strong></p><div class="contract">valueText, valueUnit, timeText, noDataText, goalWeightText, lastWeightValue, lastWeightTime, bestWeightValue, bestWeightTip, reportSummary, targetProgress, indexGrid, reportEntry, pointer, valueLayout</div><p style="margin:10px 0 2px"><strong class="mono">fragment_trend.xml</strong></p><div class="contract">weightChart, fatChart, trendWeightValue, trendFatValue, trendWeightHint, periodWeek, periodMonth, periodYear</div><p style="margin:10px 0 2px"><strong class="mono">fragment_history.xml</strong></p><div class="contract">historyList, emptyView, totalCount, latestWeight, avgWeight</div><p style="margin:10px 0 2px"><strong class="mono">item_history.xml</strong></p><div class="contract">dateHeader, dayText, timeText, weightText, fatText, weightCompare, fatCompare</div><p style="margin:10px 0 2px"><strong class="mono">fragment_me.xml</strong></p><div class="contract">nickname, roleInfo, btnNickname, btnSex, btnHeight, btnBirthday, btnGoal, btnDevice, btnUnit, btnFeedback, btnAbout</div><p style="margin:10px 0 2px"><strong class="mono">activity_measure.xml</strong></p><div class="contract">weightValue, weightUnit, bleState, hintText, logText, fatValue, waterValue, muscleValue, boneValue, backBtn</div><p style="margin:10px 0 2px"><strong class="mono">activity_report.xml</strong></p><div class="contract">reportWeight, reportDate, reportGrid, bodyTypeText, backBtn</div></section><section id="s5"><h3><span class="num">05</span>四屏逐屏改造清单</h3><p class="sub">Screen-by-Screen Implementation Checklist</p><h4>5.1　动态 · 今日概览</h4><p><strong>目标　</strong>一屏看清「现在多重、和上次比如何、离目标多远」。</p><p class="muted"><strong>契约　</strong>上表 fragment_dynamic 全部 ID 必须保留，否则 DynamicFragment 空指针崩溃。</p><ol><li style="font-size:13px;margin-bottom:7px">移除位图表盘 home_biaopan_bg 与指针 home_zhizhen_icon；pointer / valueLayout 可保留 ID 但设 visibility=gone，不要删节点。</li><li style="font-size:13px;margin-bottom:7px">新增 RingProgressView（140dp、9dp 描边、#34D399、圆角端点），叠在 valueText / valueUnit / timeText 之后作为背景层；环心数字 40sp Bold，单位 11sp。</li><li style="font-size:13px;margin-bottom:7px">Hero 底部条放 BMI / 体脂 / 肌肉三项：BMI 新算，后两项无数据 → 显示「--」，不要留空。</li><li style="font-size:13px;margin-bottom:7px">指标双卡换 bg_card_white_18：距上次（绿 #10B981 或琥珀 #F59E0B）、30 天最佳（#014DB2）；bestWeightValue 现为差值，设计稿要绝对值，需改取值。</li><li style="font-size:13px;margin-bottom:7px">目标进度：先修算法（见第 3 节），再换 bg_progress_track / bg_progress_fill；文案「已完成 x%」「还差 x kg」。</li><li style="font-size:13px;margin-bottom:7px">身体成分报告卡：三行在无数据时统一显示「-- · 该秤型不支持」或整卡收起；reportEntry 点击仍跳 ReportActivity。</li><li style="font-size:13px;margin-bottom:7px">indexGrid 由代码动态生成 6 格；无数据字段继续显示「--」，仅改 cell 背景与字号色值。</li></ol><h4>5.2　趋势 · 数据曲线</h4><p><strong>目标　</strong>把「变化」可视化，让用户看到趋势方向而非孤立数字。</p><p class="muted"><strong>契约　</strong>weightChart / fatChart / trendWeightValue / trendFatValue / trendWeightHint / periodWeek / periodMonth / periodYear 全部保留。</p><ol><li style="font-size:13px;margin-bottom:7px">周/月/年 改用 bg_segment_track + bg_segment_active，激活项白底 + 微投影；三个 OnClickListener 逻辑不变。</li><li style="font-size:13px;margin-bottom:7px">体重折线复用 LineChartView：扩展面积渐变（LinearGradient shader）、7 个数据点、末点薄荷绿高亮 + 虚线引导、日期轴标签。外裹 bg_card_white 图表卡。</li><li style="font-size:13px;margin-bottom:7px">体脂柱状图：因 fat 全为 0，改为占位态卡「体脂数据需支持 GATT 的秤型」，或整卡 GONE；不要保留假柱子。fatChart / trendFatValue 仍需在布局中存在（可设 GONE）。</li><li style="font-size:13px;margin-bottom:7px">新增「本周洞察」卡（bg_insight_green）：按近 7 天首末差值生成文案，数据 &lt; 2 条时隐藏。</li><li style="font-size:13px;margin-bottom:7px">趋势页「较上周 -1.2 kg」「范围 61.8 - 63.6 kg」均由 db.list() 计算，不写死。</li></ol><h4>5.3　历史 · 测量记录</h4><p><strong>目标　</strong>从空白变成可扫读的记录流，并给出统计口径。</p><p class="muted"><strong>契约　</strong>historyList / emptyView / totalCount / latestWeight / avgWeight，以及 item_history 内 7 个 ID。</p><ol><li style="font-size:13px;margin-bottom:7px">统计概览已有三个 TextView，改成三等分白卡 + 24sp 数字层级；数值来源不变。</li><li style="font-size:13px;margin-bottom:7px">原按日期分组的列表结构可保留；新增月份切换行「2026 年 11 月 / 共 x 条记录」。</li><li style="font-size:13px;margin-bottom:7px">记录行换 bg_record_row（14dp 圆角 / #F6F9FC），日期 11sp、体重 16sp Bold、涨跌 11sp；涨跌色统一为 #10B981 / #F59E0B（替换现有 record_up / record_dwon 色值）。</li><li style="font-size:13px;margin-bottom:7px">fatText / fatCompare 无数据 → setVisibility(GONE)，不要显示「--%」占位行。</li><li style="font-size:13px;margin-bottom:7px">新增「数据小贴士」卡（bg_tip_blue）：「固定每天同一时间测量，趋势更准确」。</li><li style="font-size:13px;margin-bottom:7px">emptyView 保留并改造为真正的空态（见第 8 节，设计侧可补稿）。</li></ol><h4>5.4　我的 · 个人中心</h4><p><strong>目标　</strong>把大色块改成有信息量的档案 + 目标 + 设备入口。</p><p class="muted"><strong>契约　</strong>nickname / roleInfo 与 9 个 btn* 全部保留，OnClickListener 逻辑不变。</p><ol><li style="font-size:13px;margin-bottom:7px">顶部改 bg_hero_gradient 个人信息卡（128dp）：头像（可沿用 default_head_image）、昵称 18sp Bold、副文案「已坚持记录 x 天 · 连续 x 天」需新增统计逻辑。</li><li style="font-size:13px;margin-bottom:7px">新增体重目标卡，与动态页共用 bg_progress_track / bg_progress_fill，保证两处进度算法一致。</li><li style="font-size:13px;margin-bottom:7px">资料列表改 bg_card_white：5 行（昵称/性别/身高/出生年月/体重目标），44dp 行高；btnUnit / btnFeedback / btnAbout 建议收进第二组列表，不要删。</li><li style="font-size:13px;margin-bottom:7px">我的设备卡：电量 82% → 「广播监听中 · 无需配对」，可接 BleManager 扫描状态做呼吸点；「管理」入口沿用 btnDevice。</li></ol></section><section id="s6"><h3><span class="num">06</span>分阶段落地建议</h3><p class="sub">Phased Delivery</p><div class="step"><b>P0</b><div><strong>数据诚实化 + 设计 Token</strong><br><span class="muted">确认第 3 节冲突决策；追加 colors.xml；修正 build.sh 路径；先跑通一次原始构建作为基线</span></div></div><div class="step"><b>P1</b><div><strong>全局框架</strong><br><span class="muted">activity_main 顶栏与浮动胶囊 TabBar、页头结构、系统状态栏配色；保留全部 ID；构建验证四 Tab 切换正常</span></div></div><div class="step"><b>P2</b><div><strong>四屏布局重排</strong><br><span class="muted">按第 6 节逐屏改 drawable / 布局；只动视觉属性，Java 绑定尽量不动</span></div></div><div class="step"><b>P3</b><div><strong>数据层与自定义 View</strong><br><span class="muted">RingProgressView、LineChartView 扩展、目标进度算法、BMI / 连续天数 / 洞察文案、无数据降级</span></div></div><div class="step"><b>P4</b><div><strong>空态与验收</strong><br><span class="muted">补首启空态（设计侧出稿）→ 真机走查 → 按第 7 节清单逐条验收 → 出 APK</span></div></div></section><section id="s7"><h3><span class="num">07</span>构建与验收清单</h3><p class="sub">Build &amp; Acceptance</p><p>构建：工程根目录执行 <span class="mono">bash build.sh</span>，产物 <span class="mono">build/youwo-scale.apk</span>；安装 <span class="mono">adb install -r</span>。每次构建前确认 build.sh 的 PROJ 指向的确实是改过的那份工程。</p><ul class="chk"><li>构建：bash build.sh 全程无错，产物 build/youwo-scale.apk 时间戳已更新；确认改动确实进了 APK（见第 2 节路径坑）</li><li>四个 Tab 切换不崩溃，MainActivity 的 OnCheckedChangeListener 与 4 个 RadioButton ID 均正常</li><li>测量按钮可进 MeasureActivity，返回后各页 refresh() 正常刷新</li><li>无数据（全新安装 / 清空 SQLite）时：体脂/肌肉/基础代谢/BMR/电量相关位置显示「--」或占位说明，不出现示例假值、不出现空白卡片</li><li>有 1 条 / 2 条 / 7 条以上记录时，折线图、统计概览、洞察卡文案与显示逻辑分别正确</li><li>360dp / 390dp / 420dp 宽度下无横向溢出，长昵称与 3 位体重数值不被裁切</li><li>深色系统主题下不出现白底白字（当前 AppTheme 为 Light，需显式锁定或适配）</li><li>色彩语义：下降为 #10B981、上升为 #F59E0B、主操作为 #014DB2；全 App 不出现旧青色 #52C3F2</li><li>系统字号调至最大时，环心 40sp 数字与卡片标题不截断</li><li>视觉走查：与 4 张设计稿逐屏对照，圆角/间距/投影/字重层级一致</li></ul></section><section id="s8"><h3><span class="num">08</span>开放问题</h3><p class="sub">Open Questions — 需产品 / 设计确认</p><table><thead><tr><th>议题</th><th>待确认内容</th></tr></thead><tbody><tr><td>身体成分卡片</td><td>删除 / 显示为「该秤型不支持」/ 保留但引导更换支持 GATT 的秤型 —— 需产品决策，设计侧可据此补稿</td></tr><tr><td>目标进度百分比</td><td>「已完成 68%」需要起始体重作为分母；工程目前无该 KV。是否新增「起始体重」设置项？</td></tr><tr><td>「已同步」文案</td><td>本 App 纯本地无云，建议改「已记录」，需产品确认</td></tr><tr><td>空态版本</td><td>设计稿是有数据的理想态；首启空态需单独补设计（插画 + 引导测量文案），是否要做？</td></tr><tr><td>Inter Tight 字体</td><td>引入字体文件会增加 APK 体积（约 100–200KB/字重）；是否接受，还是退化用系统 sans-medium？</td></tr><tr><td>技术栈约束</td><td>引荐的安卓专家默认产出 Kotlin + Compose；本工程是 Java + XML View + aapt2 手工构建，交接时请明确要求沿用现有技术栈，不要迁移到 Compose</td></tr></tbody></table><div class="warnbox"><strong>⚠ 技术栈约束：</strong>引荐的安卓开发专家默认产出 Kotlin + Compose 代码，而本工程是 Java + XML View + aapt2 手工构建。交接时请明确要求沿用现有技术栈，仅做 UI 还原，不要迁移到 Compose 或引入 Gradle。</div></section><section id="s9"><h3><span class="num">附录</span>交付物路径索引</h3><p class="sub">Asset Index</p><table><thead><tr><th>交付物</th><th>路径 / 说明</th></tr></thead><tbody><tr><td>视觉稿 4 张</td><td>work\重设计稿\01_动态.png ~ 04_我的.png（780×1688 @2x）</td></tr><tr><td>设计说明文档</td><td>work\设计文档\电子体重秤记录App_界面优化设计文档_v2.docx / .html</td></tr><tr><td>本交接说明</td><td>work\设计文档\UI重设计_Android工程落地交接说明.docx / .html</td></tr><tr><td>可编辑画布</td><td>Ardot「体重管理 App 界面优化 v2」，fileId 746178334706973</td></tr><tr><td>工程 README</td><td>youwo_app\README.md（蓝牙协议、构建方式、已知限制）</td></tr></tbody></table></section></main></div><footer>UI 重设计 v2 · Android 工程落地交接说明 · v1.0 · 2026.11.11 · 待开发接手</footer></body></html>

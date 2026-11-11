@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NEON//SCALE · 视觉与动效预览</title>
+<style>
+:root{
+  --bg:#05060F; --bg2:#0A0F22; --surf:#0B1020; --surf2:#101A33;
+  --line:#1D2C4E; --grid:#14203A;
+  --cyan:#00F0FF; --magenta:#FF2E97; --purple:#8B5CF6;
+  --green:#39FF88; --amber:#FFB020; --blue:#4D7CFF;
+  --t1:#E9F6FF; --t2:#8194BC; --t3:#4A5B7F;
+  --mono:ui-monospace,SFMono-Regular,Consolas,"Liberation Mono",monospace;
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--t1);font-family:var(--sans);line-height:1.6;
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+  background-size:34px 34px;background-attachment:fixed}
+.wrap{max-width:1500px;margin:0 auto;padding:48px 28px 80px}
+
+/* ---------- 页头 ---------- */
+.hero{position:relative;overflow:hidden;border:1px solid var(--line);border-radius:20px;
+  padding:38px 40px;margin-bottom:40px;
+  background:radial-gradient(circle at 8% 0%,rgba(0,240,255,.12),transparent 46%),
+             radial-gradient(circle at 100% 100%,rgba(255,46,151,.12),transparent 46%),
+             linear-gradient(160deg,var(--bg2),var(--bg))}
+.hero:after{content:"";position:absolute;left:0;right:0;height:2px;top:0;
+  background:linear-gradient(90deg,transparent,var(--cyan),var(--magenta),transparent);
+  opacity:.8;animation:flow 4s linear infinite}
+@keyframes flow{0%{transform:translateX(-100%)}100%{transform:translateX(100%)}}
+.logo{font-family:var(--mono);font-size:38px;font-weight:900;letter-spacing:-2px}
+.logo .n{color:var(--cyan);text-shadow:0 0 24px rgba(0,240,255,.6)}
+.logo .s{color:var(--magenta);text-shadow:0 0 24px rgba(255,46,151,.5)}
+.tag{display:inline-block;margin-top:10px;font:11px var(--mono);letter-spacing:2px;color:var(--cyan);
+  border:1px solid rgba(0,240,255,.35);border-radius:20px;padding:5px 14px;background:rgba(0,240,255,.07)}
+.hero p{margin-top:18px;color:var(--t2);font-size:13px;max-width:820px}
+.hero .meta{margin-top:14px;font:10px var(--mono);color:var(--t3);letter-spacing:1px}
+
+h2{font-family:var(--mono);font-size:13px;letter-spacing:2px;color:var(--cyan);
+  margin:44px 0 18px;padding-left:12px;border-left:3px solid var(--cyan)}
+h2 small{color:var(--t3);font-size:10px;margin-left:10px;letter-spacing:1px}
+
+/* ---------- 手机阵列 ---------- */
+.phones{display:grid;grid-template-columns:repeat(4,1fr);gap:22px}
+@media(max-width:1250px){.phones{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:680px){.phones{grid-template-columns:1fr}}
+.device{position:relative;border:1px solid var(--line);border-radius:26px;overflow:hidden;
+  background:var(--bg);box-shadow:0 20px 60px rgba(0,0,0,.6),0 0 0 1px rgba(0,240,255,.05)}
+.device:hover{box-shadow:0 24px 70px rgba(0,240,255,.12),0 0 0 1px rgba(0,240,255,.25)}
+.dlabel{display:flex;align-items:center;gap:8px;padding:10px 14px;border-bottom:1px solid var(--line);
+  font:10px var(--mono);letter-spacing:1.5px;color:var(--t2);background:rgba(11,16,32,.9)}
+.dlabel b{color:var(--cyan);font-weight:700}
+.dlabel span{margin-left:auto;color:var(--t3)}
+.screen{position:relative;height:600px;overflow:hidden;padding:0 13px;
+  background:radial-gradient(circle at 0 0,rgba(0,240,255,.09),transparent 55%),
+             radial-gradient(circle at 100% 100%,rgba(255,46,151,.08),transparent 55%),var(--bg)}
+.screen:before{content:"";position:absolute;inset:0;pointer-events:none;
+  background-image:linear-gradient(rgba(20,32,58,.8) 1px,transparent 1px),linear-gradient(90deg,rgba(20,32,58,.8) 1px,transparent 1px);
+  background-size:26px 26px}
+.screen:after{content:"";position:absolute;left:0;right:0;height:60px;top:-60px;pointer-events:none;
+  background:linear-gradient(180deg,transparent,rgba(0,240,255,.09));
+  border-bottom:1px solid rgba(0,240,255,.35);animation:scan 7s linear infinite}
+@keyframes scan{0%{top:-60px}100%{top:100%}}
+.screen>*{position:relative;z-index:1}
+.status{display:flex;justify-content:space-between;font:9px var(--mono);color:var(--t2);padding:9px 2px 6px}
+.topbar{display:flex;align-items:center;font:12px var(--mono);font-weight:900;letter-spacing:-.5px;padding:6px 0 10px;
+  border-bottom:1px solid var(--line);margin-bottom:11px}
+.topbar .a{color:var(--cyan)}.topbar .b{color:var(--magenta)}
+.led{width:6px;height:6px;border-radius:50%;background:var(--green);margin-left:auto;
+  box-shadow:0 0 10px var(--green);animation:blink 1.4s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.25}}
+.sec{display:flex;align-items:center;gap:6px;font:9px var(--mono);letter-spacing:1px;color:var(--t2);margin:11px 0 7px}
+.sec i{width:3px;height:11px;background:var(--cyan);display:block;border-radius:2px}
+.sec em{color:var(--cyan);font-style:normal;opacity:.7}
+.sec u{margin-left:auto;text-decoration:none;color:var(--t3);font-size:8px}
+
+/* 卡片 */
+.card{position:relative;background:rgba(11,16,32,.82);border:1px solid var(--line);border-radius:13px;padding:11px;margin-bottom:9px;overflow:hidden}
+.card:before{content:"";position:absolute;left:12px;right:12px;top:0;height:1px;
+  background:linear-gradient(90deg,transparent,var(--cyan),transparent);opacity:.85}
+.card.mg:before{background:linear-gradient(90deg,transparent,var(--magenta),transparent)}
+.card.pu:before{background:linear-gradient(90deg,transparent,var(--purple),transparent)}
+
+/* 用户芯片 */
+.chips{display:flex;gap:7px;overflow-x:auto;padding-bottom:4px}
+.chip{flex:0 0 auto;display:flex;align-items:center;gap:7px;padding:5px 9px;border-radius:11px;
+  border:1px solid var(--line);background:var(--surf2);font-size:10px}
+.chip.on{border-color:rgba(0,240,255,.7);background:rgba(0,240,255,.11);color:var(--cyan)}
+.av{width:24px;height:24px;border-radius:50%;display:grid;place-items:center;font-size:11px;font-weight:700;
+  background:rgba(0,240,255,.14);color:var(--cyan);position:relative}
+.av.on:after{content:"";position:absolute;inset:-3px;border-radius:50%;
+  border:1.5px solid transparent;border-top-color:var(--cyan);border-right-color:var(--cyan);
+  animation:spin 4s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.chip small{display:block;font:7px var(--mono);color:var(--t3)}
+
+/* 环形仪表 */
+.gauge{position:relative;height:216px;display:grid;place-items:center;margin:2px 0 8px}
+.ripple{position:absolute;width:200px;height:200px;border-radius:50%;border:1px solid rgba(0,240,255,.4);animation:ripple 2.6s ease-out infinite}
+.ripple:nth-child(2){animation-delay:.85s}.ripple:nth-child(3){animation-delay:1.7s}
+@keyframes ripple{0%{transform:scale(.15);opacity:.9}100%{transform:scale(1.15);opacity:0}}
+.ring{position:absolute;width:182px;height:182px;border-radius:50%;
+  background:conic-gradient(from -90deg,var(--cyan),var(--purple) 38%,var(--magenta) 68%,rgba(255,255,255,.06) 68%,rgba(255,255,255,.06));
+  mask:radial-gradient(farthest-side,transparent calc(100% - 9px),#000 calc(100% - 8px));
+  -webkit-mask:radial-gradient(farthest-side,transparent calc(100% - 9px),#000 calc(100% - 8px));
+  filter:drop-shadow(0 0 9px rgba(0,240,255,.65))}
+.ticks{position:absolute;width:206px;height:206px;border-radius:50%;
+  border:1px dashed rgba(0,240,255,.16);animation:spin 28s linear infinite}
+.ticks:after{content:"";position:absolute;top:-4px;left:50%;width:7px;height:7px;border-radius:50%;
+  background:#fff;box-shadow:0 0 12px var(--cyan);transform:translateX(-50%)}
+.gcenter{text-align:center;z-index:2}
+.gcenter .cap{font:8px var(--mono);letter-spacing:1.5px;color:var(--t3)}
+.gcenter .num{font:900 44px/1.15 var(--mono);letter-spacing:-3px;
+  text-shadow:0 0 26px rgba(0,240,255,.75);animation:glow 2.4s ease-in-out infinite alternate}
+@keyframes glow{from{text-shadow:0 0 12px rgba(0,240,255,.4)}to{text-shadow:0 0 34px rgba(0,240,255,.95)}}
+.gcenter .unit{font:10px var(--mono);letter-spacing:3px;color:var(--cyan)}
+.badge{display:inline-block;margin-top:9px;padding:3px 10px;border-radius:20px;font:8px var(--mono);
+  color:var(--green);border:1px solid rgba(57,255,136,.45);background:rgba(57,255,136,.1)}
+
+/* 状态 / hex */
+.row{display:flex;align-items:center;gap:7px;font:9px var(--mono);color:var(--t2)}
+.row .r{margin-left:auto;color:var(--t3)}
+.bars{display:flex;align-items:flex-end;gap:2px;height:13px}
+.bars i{width:3px;background:var(--cyan);border-radius:1px;display:block}
+.hex{margin-top:8px;padding-top:8px;border-top:1px solid rgba(29,44,78,.8);
+  font:8px/1.6 var(--mono);color:rgba(0,240,255,.75);word-break:break-all}
+.hex b{color:var(--magenta)}
+.cur{display:inline-block;width:5px;height:9px;background:var(--cyan);vertical-align:-1px;animation:blink .7s steps(1) infinite}
+
+/* 指标卡 */
+.metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
+.metric{background:rgba(11,16,32,.8);border:1px solid var(--line);border-radius:11px;padding:9px 7px}
+.metric label{display:block;font:8px var(--mono);color:var(--t2)}
+.metric strong{display:block;margin:6px 0 3px;font:700 15px var(--mono);
+  text-shadow:0 0 14px currentColor}
+.metric small{font:7px var(--sans);color:var(--t3)}
+.c-cy{color:var(--cyan)}.c-mg{color:var(--magenta)}.c-gr{color:var(--green)}
+.c-am{color:var(--amber)}.c-pu{color:var(--purple)}
+
+/* 图表 */
+.pills{display:flex;gap:6px;margin-bottom:9px}
+.pill{font:9px var(--mono);padding:5px 12px;border-radius:20px;border:1px solid var(--line);color:var(--t2)}
+.pill.on{color:var(--cyan);border-color:rgba(0,240,255,.7);background:rgba(0,240,255,.13)}
+.chartbox{height:150px;position:relative;margin:6px 0}
+.chartbox svg{width:100%;height:100%;overflow:visible}
+.chartbox .ln{fill:none;stroke:url(#g1);stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;
+  stroke-dasharray:600;stroke-dashoffset:600;animation:draw 2.2s ease forwards;filter:drop-shadow(0 0 5px rgba(0,240,255,.8))}
+@keyframes draw{to{stroke-dashoffset:0}}
+.chartbox .dot{fill:#fff;filter:drop-shadow(0 0 5px var(--cyan))}
+.chartbox .end{animation:pulseDot 1.6s ease-in-out infinite}
+@keyframes pulseDot{0%,100%{r:9;opacity:.22}50%{r:14;opacity:.05}}
+.axis{display:flex;justify-content:space-between;font:8px var(--mono);color:var(--t3)}
+
+/* 列表 */
+.rec{display:flex;align-items:center;gap:9px;background:rgba(11,16,32,.8);border:1px solid var(--line);
+  border-radius:11px;padding:9px 10px;margin-bottom:7px;opacity:0;animation:fadeUp .55s ease forwards}
+.rec:nth-child(1){animation-delay:.1s}.rec:nth-child(2){animation-delay:.25s}
+.rec:nth-child(3){animation-delay:.4s}.rec:nth-child(4){animation-delay:.55s}
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+.rec .bar{width:3px;height:28px;background:var(--cyan);border-radius:2px}
+.rec .t{font:10px var(--mono);color:var(--t1)}
+.rec .s{font:7px var(--mono);color:var(--t3);margin-top:2px}
+.rec .v{margin-left:auto;text-align:right}
+.rec .v b{font:700 13px var(--mono);color:var(--cyan)}
+.rec .v small{display:block;font:8px var(--mono);color:var(--green)}
+
+/* 成员卡 */
+.ucard{display:flex;align-items:center;gap:9px;margin-bottom:8px}
+.ucard .nm{font-size:11px;font-weight:700}
+.ucard .sub{font:8px var(--mono);color:var(--t3)}
+.act{margin-left:auto;font:8px var(--mono);color:var(--cyan);border:1px solid rgba(0,240,255,.5);
+  border-radius:16px;padding:3px 8px}
+.kv{display:flex;justify-content:space-between;font:9px var(--mono);padding:4px 0;border-bottom:1px dashed rgba(29,44,78,.7)}
+.kv span{color:var(--t2)}.kv b{color:var(--cyan);font-weight:500;text-align:right}
+.note{font:9px/1.6 var(--sans);color:var(--t3);margin-top:8px}
+
+/* 底部导航 */
+.nav{position:absolute;bottom:0;left:0;right:0;display:grid;grid-template-columns:repeat(4,1fr);
+  padding:8px 4px 10px;background:rgba(5,6,15,.96);border-top:1px solid var(--line);z-index:3}
+.nav div{text-align:center;font-size:9px;color:var(--t2)}
+.nav div.on{color:var(--cyan);font-weight:700}
+.nav div i{display:block;width:18px;height:2px;margin:0 auto 5px;border-radius:2px;background:transparent}
+.nav div.on i{background:var(--cyan);box-shadow:0 0 8px var(--cyan)}
+.nav div em{display:block;font:7px var(--mono);font-style:normal;color:var(--t3);margin-top:2px}
+.nav div .ic{display:block;font:13px var(--mono);height:16px;line-height:16px}
+
+/* ---------- 说明区 ---------- */
+.panel{border:1px solid var(--line);border-radius:16px;padding:24px 26px;background:rgba(11,16,32,.6);margin-bottom:16px}
+.palette{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:12px}
+.sw{display:flex;align-items:center;gap:10px;font:9px var(--mono);color:var(--t2)}
+.sw i{width:34px;height:34px;border-radius:9px;border:1px solid rgba(255,255,255,.12);display:block}
+table{width:100%;border-collapse:collapse;font-size:12px}
+th,td{text-align:left;padding:9px 10px;border-bottom:1px solid rgba(29,44,78,.6);vertical-align:top}
+th{font:10px var(--mono);letter-spacing:1px;color:var(--cyan);font-weight:600}
+td{color:var(--t2)}td:first-child{color:var(--t1);font-family:var(--mono);font-size:11px}
+code{font:11px var(--mono);color:var(--cyan);background:rgba(0,240,255,.08);padding:1px 5px;border-radius:4px}
+.foot{margin-top:32px;text-align:center;font:10px var(--mono);color:var(--t3);letter-spacing:1px}
+.warn{border-left:3px solid var(--amber);background:rgba(255,176,32,.07);padding:12px 16px;
+  border-radius:0 10px 10px 0;font-size:12px;color:var(--t2);margin-top:14px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="hero">
+    <div class="logo"><span class="n">NEON</span><span class="s">//</span>SCALE</div>
+    <div class="tag">BROADCAST TELEMETRY TERMINAL · v1.1</div>
+    <p>面向<strong>纯 BLE 广播电子秤</strong>的体重记录 App。视觉语言直接建立在真实数据流上：实时 hex 帧、RSSI 信号条、SEQ 递增、环形仪表与扫描波纹。v1.1 新增<strong>BMI 国标四级配色</strong>与 8 项体成分指标——这些由「体重 + 档案」公式估算，明确标注非秤体实测，绝不冒充实测值。</p>
+    <div class="meta">KOTLIN · JETPACK COMPOSE · ROOM · STATEFLOW &nbsp;|&nbsp; 视觉与动效预览（非真机截图，v1.1 已同步）</div>
+  </div>
+
+  <h2>01 / 四屏视觉 <small>SCREEN PREVIEW · 含实时 CSS 动效</small></h2>
+  <div class="phones">
+
+    <!-- 测量 -->
+    <div class="device">
+      <div class="dlabel"><b>01</b> 测量 · MEASURE <span>390×844</span></div>
+      <div class="screen">
+        <div class="status"><span>9:41</span><span>▮▮▮ ▽ 82%</span></div>
+        <div class="topbar"><span class="a">NEON</span><span class="b">//</span>SCALE <span style="font-size:8px;color:var(--t3);margin-left:6px">v1.1</span><i class="led"></i></div>
+        <div class="sec"><i></i>测量对象 <em>[SUBJECT]</em><u>2 PROFILES</u></div>
+        <div class="chips">
+          <div class="chip on"><div class="av on">林</div><div>林一<small>● ACTIVE</small></div></div>
+          <div class="chip"><div class="av" style="color:var(--magenta);background:rgba(255,46,151,.14)">陈</div><div>陈默<small>TAP TO SWITCH</small></div></div>
+        </div>
+        <div class="gauge">
+          <div class="ripple"></div><div class="ripple"></div><div class="ripple"></div>
+          <div class="ticks"></div><div class="ring"></div>
+          <div class="gcenter">
+            <div class="cap">CURRENT MASS / 当前体重</div>
+            <div class="num">62.40</div>
+            <div class="unit">KG</div>
+            <div class="badge">LOCKED · 数值已锁定</div>
+          </div>
+        </div>
+        <div class="card" style="border-color:rgba(57,255,136,.35)">
+          <div class="row"><span style="color:var(--t2);font-size:9px">BMI 身体质量指数 · 国标分级</span><span class="r" style="color:var(--t3);font-size:8px">18.5 ~ 23.9</span></div>
+          <div class="row" style="margin-top:6px">
+            <b style="font-size:26px;color:var(--green);font-family:monospace">21.6</b>
+            <span style="background:rgba(57,255,136,.14);border:1px solid rgba(57,255,136,.6);color:var(--green);border-radius:20px;padding:3px 11px;font-size:10px">正常</span>
+            <span class="r" style="color:var(--t3);font-size:8px">圆环主弧随等级变色</span>
+          </div>
+          <div style="display:flex;gap:3px;margin-top:9px">
+            <i style="flex:1;height:5px;border-radius:3px;background:rgba(255,255,255,.12)"></i>
+            <i style="flex:1;height:5px;border-radius:3px;background:var(--green);box-shadow:0 0 9px var(--green)"></i>
+            <i style="flex:1;height:5px;border-radius:3px;background:rgba(255,255,255,.12)"></i>
+            <i style="flex:1;height:5px;border-radius:3px;background:rgba(255,255,255,.12)"></i>
+          </div>
+          <div class="row" style="margin-top:5px;font-size:8px;color:var(--t3)">
+            <span style="flex:1;text-align:center">偏瘦</span><span style="flex:1;text-align:center;color:var(--green)">正常</span><span style="flex:1;text-align:center">超重</span><span style="flex:1;text-align:center">肥胖</span>
+          </div>
+          <div class="note" style="margin-top:8px">测量完成后，8 项公式估算指标随记录保存，可在「档案」页点开查看。</div>
+        </div>
+        <div class="card">
+          <div class="row"><i class="led" style="margin:0"></i> STREAM · 实时数据
+            <span class="r">-58 dBm</span><span class="bars"><i style="height:4px"></i><i style="height:7px"></i><i style="height:10px"></i><i style="height:13px"></i></span>
+          </div>
+          <div class="hex"><b>RX</b> CA 20 0B 12 12 12 12 01 05 25 1D 74 03 E8 E1 C8 FA DF<span class="cur"></span></div>
+          <div class="row" style="margin-top:6px"><span>MAC AA:BB:CC:DD:EE:FF</span><span class="r c-mg">PAUSE</span></div>
+        </div>
+        <div class="sec"><i></i>关键指标 <em>[METRICS]</em></div>
+        <div class="metrics">
+          <div class="metric"><label>距上次</label><strong class="c-gr">-0.30</strong><small>向目标靠近</small></div>
+          <div class="metric"><label>30 天最佳</label><strong class="c-cy">61.80</strong><small>区间最低值</small></div>
+          <div class="metric"><label>目标进度</label><strong class="c-mg">68%</strong><small>目标 60.00</small></div>
+        </div>
+        <div class="nav">
+          <div class="on"><i></i><span class="ic">◎</span>测量<em>01</em></div>
+          <div><i></i><span class="ic">⌁</span>趋势<em>02</em></div>
+          <div><i></i><span class="ic">▤</span>档案<em>03</em></div>
+          <div><i></i><span class="ic">◈</span>成员<em>04</em></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 趋势 -->
+    <div class="device">
+      <div class="dlabel"><b>02</b> 趋势 · TREND <span>CANVAS 手绘</span></div>
+      <div class="screen">
+        <div class="status"><span>9:41</span><span>▮▮▮ ▽ 82%</span></div>
+        <div class="topbar"><span class="a">NEON</span><span class="b">//</span>SCALE <i class="led"></i></div>
+        <div class="sec"><i></i>体重趋势 <em>[TREND]</em><u>7 SAMPLES</u></div>
+        <div class="pills"><span class="pill on">7D</span><span class="pill">30D</span><span class="pill">365D</span><span class="pill" style="margin-left:auto;border:0;color:var(--t3)">林一</span></div>
+        <div class="card">
+          <div class="row"><span style="color:var(--t1);font-size:11px">WEIGHT / 体重</span><span class="r c-cy">KG</span></div>
+          <div style="font:700 26px var(--mono);color:var(--cyan);text-shadow:0 0 20px rgba(0,240,255,.5)">62.40</div>
+          <div class="chartbox">
+            <svg viewBox="0 0 260 150" preserveAspectRatio="none">
+              <defs>
+                <linearGradient id="g1" x1="0" y1="0" x2="1" y2="0"><stop stop-color="#00F0FF"/><stop offset="1" stop-color="#8B5CF6"/></linearGradient>
+                <linearGradient id="g2" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#00F0FF" stop-opacity=".3"/><stop offset="1" stop-color="#00F0FF" stop-opacity="0"/></linearGradient>
+              </defs>
+              <g stroke="#1D2C4E" stroke-dasharray="3 5">
+                <path d="M0 20H260M0 55H260M0 90H260M0 125H260"/>
+              </g>
+              <path d="M8 38 L50 55 L92 46 L134 72 L176 84 L218 92 L252 104 L252 135 L8 135Z" fill="url(#g2)"/>
+              <path d="M0 118H260" stroke="#FF2E97" stroke-width="1" stroke-dasharray="6 6" opacity=".7"/>
+              <path class="ln" d="M8 38 L50 55 L92 46 L134 72 L176 84 L218 92 L252 104"/>
+              <g class="dot"><circle cx="8" cy="38" r="2"/><circle cx="50" cy="55" r="2"/><circle cx="92" cy="46" r="2"/><circle cx="134" cy="72" r="2"/><circle cx="176" cy="84" r="2"/><circle cx="218" cy="92" r="2"/></g>
+              <circle class="end" cx="252" cy="104" r="9" fill="#00F0FF" opacity=".22"/>
+              <circle cx="252" cy="104" r="4" fill="#00F0FF"/>
+            </svg>
+          </div>
+          <div class="axis"><span>11.05 07:42</span><span class="c-mg">TARGET 60.00</span><span>11.11 07:38</span></div>
+        </div>
+        <div class="sec"><i style="background:var(--purple)"></i>区间统计 <em>[STATISTICS]</em></div>
+        <div class="metrics" style="grid-template-columns:repeat(2,1fr)">
+          <div class="metric"><label>区间最高</label><strong class="c-am">63.60</strong><small>峰值</small></div>
+          <div class="metric"><label>区间最低</label><strong class="c-gr">62.40</strong><small>谷值</small></div>
+          <div class="metric"><label>平均体重</label><strong class="c-cy">62.91</strong><small>全部记录</small></div>
+          <div class="metric"><label>区间变化</label><strong class="c-gr">-1.20</strong><small>首末对比</small></div>
+        </div>
+        <div class="card mg" style="margin-top:9px"><div class="kv"><span>GOAL / 目标进度</span><b>已完成 68%</b></div><div class="note">按 (起始 − 当前) / (起始 − 目标) 计算</div></div>
+        <div class="nav">
+          <div><i></i><span class="ic">◎</span>测量<em>01</em></div>
+          <div class="on"><i></i><span class="ic">⌁</span>趋势<em>02</em></div>
+          <div><i></i><span class="ic">▤</span>档案<em>03</em></div>
+          <div><i></i><span class="ic">◈</span>成员<em>04</em></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 档案 -->
+    <div class="device">
+      <div class="dlabel"><b>03</b> 档案 · ARCHIVE <span>逐条入场</span></div>
+      <div class="screen">
+        <div class="status"><span>9:41</span><span>▮▮▮ ▽ 82%</span></div>
+        <div class="topbar"><span class="a">NEON</span><span class="b">//</span>SCALE <i class="led"></i></div>
+        <div class="sec"><i></i>测量档案 <em>[ARCHIVE]</em><u>24 RECORDS</u></div>
+        <div class="metrics">
+          <div class="metric"><label>测量次数</label><strong class="c-cy">24</strong><small>全部时间</small></div>
+          <div class="metric"><label>最新体重</label><strong class="c-cy">62.40</strong><small>最近一次</small></div>
+          <div class="metric"><label>平均体重</label><strong class="c-mg">63.10</strong><small>全部记录</small></div>
+        </div>
+        <div class="sec"><i></i>林一 的记录流 <u style="color:var(--magenta)">CLEAR ALL</u></div>
+        <div class="rec"><div class="bar"></div><div><div class="t">11.11&nbsp; 07:42</div><div class="s" style="color:var(--green)">BMI 21.6 · 正常 ›</div></div><div class="v"><b>62.40</b><small>-0.30</small></div></div>
+        <div class="rec"><div class="bar" style="background:var(--purple)"></div><div><div class="t">11.10&nbsp; 07:38</div><div class="s" style="color:var(--green)">BMI 21.7 · 正常 ›</div></div><div class="v"><b>62.70</b><small>-0.20</small></div></div>
+        <div class="rec"><div class="bar" style="background:var(--magenta)"></div><div><div class="t">11.09&nbsp; 08:05</div><div class="s" style="color:var(--green)">BMI 21.8 · 正常 ›</div></div><div class="v"><b>62.90</b><small style="color:var(--amber)">+0.20</small></div></div>
+        <div class="rec"><div class="bar" style="background:var(--green)"></div><div><div class="t">11.08&nbsp; 07:51</div><div class="s" style="color:var(--green)">BMI 21.7 · 正常 ›</div></div><div class="v"><b>62.70</b><small>-0.10</small></div></div>
+        <div class="card pu" style="margin-top:12px"><div class="note" style="margin:0">点开任意记录可查看 BMI 等级与 8 项体成分估算指标（体脂率 / BMR / IBW / LBM / FM / 相对体重指数 / 肥胖度），并保留 SEQ / RSSI / MAC 原始遥测。<b style="color:var(--amber)">估算值非秤体实测</b>。</div></div>
+        <div class="nav">
+          <div><i></i><span class="ic">◎</span>测量<em>01</em></div>
+          <div><i></i><span class="ic">⌁</span>趋势<em>02</em></div>
+          <div class="on"><i></i><span class="ic">▤</span>档案<em>03</em></div>
+          <div><i></i><span class="ic">◈</span>成员<em>04</em></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 成员 -->
+    <div class="device">
+      <div class="dlabel"><b>04</b> 成员 · PROFILES <span>多人档案</span></div>
+      <div class="screen">
+        <div class="status"><span>9:41</span><span>▮▮▮ ▽ 82%</span></div>
+        <div class="topbar"><span class="a">NEON</span><span class="b">//</span>SCALE <i class="led"></i></div>
+        <div class="sec"><i style="background:var(--purple)"></i>成员档案 <em>[PROFILES]</em><u style="color:var(--purple)">+ NEW</u></div>
+        <div class="card">
+          <div class="ucard"><div class="av on">林</div><div><div class="nm">林一</div><div class="sub">女 · 31 岁 · 168 cm</div></div><div class="act">ACTIVE</div></div>
+          <div class="kv"><span>出生</span><b>1995.04.12（年龄自动计算）</b></div>
+          <div class="kv"><span>性别 / 身高</span><b>女 / 168 cm</b></div>
+          <div class="kv"><span>目标</span><b>60.00 kg</b></div><div class="kv"><span>起始</span><b>65.00 kg</b></div>
+          <div class="row" style="margin-top:9px"><span class="pill on" style="font-size:8px;padding:3px 9px">CURRENT</span><span class="pill" style="font-size:8px;padding:3px 9px">编辑</span><span class="pill c-mg" style="font-size:8px;padding:3px 9px;margin-left:auto">删除</span></div>
+        </div>
+        <div class="card mg">
+          <div class="ucard"><div class="av" style="color:var(--magenta);background:rgba(255,46,151,.14)">陈</div><div><div class="nm">陈默</div><div class="sub">男 · 28 岁 · 178 cm</div></div></div>
+          <div class="kv"><span>出生</span><b>1998.09.03</b></div>
+          <div class="kv"><span>目标</span><b>72.00 kg</b></div><div class="kv"><span>起始</span><b>74.20 kg</b></div>
+        </div>
+        <div class="card" style="border-color:rgba(57,255,136,.35)"><div class="note" style="margin:0"><b style="color:var(--green)">体成分估算</b>：补全性别 / 身高 / 出生年月日 / 目标体重后，每次测量自动计算 8 项指标并随记录保存。<b style="color:var(--amber)">公式为估算，非秤体实测</b>；历史记录可按当前档案补算。</div></div>
+        <div class="card"><div class="sec" style="margin:0 0 8px"><i></i>显示单位 <em>[UNIT]</em></div>
+          <div class="pills" style="margin:0"><span class="pill on">kg</span><span class="pill">斤</span><span class="pill">lb</span></div>
+          <div class="note">数据库恒定 kg 存储，切换只影响显示</div>
+        </div>
+        <div class="card mg">
+          <div class="sec" style="margin:0 0 8px"><i style="background:var(--magenta)"></i>设备与协议 <em>[DEVICE]</em></div>
+          <div class="kv"><span>秤型</span><b>KONKA / Chipsea 2.0</b></div>
+          <div class="kv"><span>连接方式</span><b>仅广播扫描</b></div>
+          <div class="kv"><span>公司 ID</span><b>0x20CA</b></div>
+          <div class="kv"><span>有效字段</span><b>体重·SEQ·R1·MAC</b></div>
+        </div>
+        <div class="nav">
+          <div><i></i><span class="ic">◎</span>测量<em>01</em></div>
+          <div><i></i><span class="ic">⌁</span>趋势<em>02</em></div>
+          <div><i></i><span class="ic">▤</span>档案<em>03</em></div>
+          <div class="on"><i></i><span class="ic">◈</span>成员<em>04</em></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <h2>02 / 色板 <small>NEON TOKENS</small></h2>
+  <div class="panel"><div class="palette">
+    <div class="sw"><i style="background:#05060F"></i>#05060F 画布</div>
+    <div class="sw"><i style="background:#0B1020"></i>#0B1020 表面</div>
+    <div class="sw"><i style="background:#101A33"></i>#101A33 次级面</div>
+    <div class="sw"><i style="background:#1D2C4E"></i>#1D2C4E 描边</div>
+    <div class="sw"><i style="background:#00F0FF"></i>#00F0FF 主青</div>
+    <div class="sw"><i style="background:#FF2E97"></i>#FF2E97 品红</div>
+    <div class="sw"><i style="background:#8B5CF6"></i>#8B5CF6 紫</div>
+    <div class="sw"><i style="background:#39FF88"></i>#39FF88 向好</div>
+    <div class="sw"><i style="background:#FFB020"></i>#FFB020 上升</div>
+    <div class="sw"><i style="background:#4D7CFF"></i>#4D7CFF 成员色</div>
+    <div class="sw"><i style="background:#E9F6FF"></i>#E9F6FF 主文字</div>
+    <div class="sw"><i style="background:#8194BC"></i>#8194BC 次文字</div>
+  </div></div>
+
+  <h2>03 / 动效清单 <small>MOTION SPEC</small></h2>
+  <div class="panel"><table>
+    <tr><th>组件</th><th>动效</th><th>节奏</th></tr>
+    <tr><td>CyberGridBackground</td><td>透视网格 + 扫描线拖尾 + 双色呼吸辉光</td><td>7s 循环 / 3.6s 呼吸</td></tr>
+    <tr><td>NeonRingGauge</td><td>72 格刻度环、渐变进度弧、发光复描、旋转光点、spring 数字滚动</td><td>5s 扫描态 / 14s 待机</td></tr>
+    <tr><td>ScanPulse</td><td>三层同心波纹错峰扩散</td><td>2.4s，错峰 0.8s</td></tr>
+    <tr><td>NeonLineChart</td><td>曲线从底部升起、三次描边辉光、目标虚线、末点呼吸</td><td>0.9s 入场 / 1.4s 脉冲</td></tr>
+    <tr><td>HexStream</td><td>实时广播帧 hex 滚动 + 闪烁终端光标</td><td>0.6s</td></tr>
+    <tr><td>HistoryScreen</td><td>列表项 fade + slide 错峰入场</td><td>0.3s，间隔 0.15s</td></tr>
+    <tr><td>页面切换 / UserAvatar</td><td>AnimatedContent 淡入淡出 / 激活成员旋转弧</td><td>0.26s / 6s</td></tr>
+  </table></div>
+
+  <h2>04 / 协议与数据约束 <small>PROTOCOL FACTS</small></h2>
+  <div class="panel"><table>
+    <tr><th>项</th><th>说明</th></tr>
+    <tr><td>广播帧</td><td>manufacturer AD type <code>0xFF</code>，公司 ID <code>0x20CA</code>（小端 <code>CA 20</code>），共 21 字节</td></tr>
+    <tr><td>实测样例</td><td><code>CA 20 0B 12 12 12 12 01 05 25 1D 74 03 E8 E1 AA BB CC DD EE FF</code> → 7540÷100 = <strong style="color:var(--cyan)">75.40 kg</strong></td></tr>
+    <tr><td>properties bit0</td><td><strong>最终值 / 锁定标志</strong>。<code>0x05</code> 最终 2 位小数、<code>0x04</code> 实时 2 位小数</td></tr>
+    <tr><td>落库规则</td><td>实时帧只驱动 UI；最终帧 2.5s 滑窗、同 seq ≥2 条且极差 ≤0.05kg 才写一条，20s 同值兜底去重</td></tr>
+    <tr><td>多人归属</td><td>记录归属当前激活成员；保存后 Snackbar「改归属」可改挂到别的成员</td></tr>
+    <tr><td>本地存储</td><td>Room / SQLite <code>cyberscale.db</code>，users 与 records 一对多 + 外键级联；无账号、无云、无网络</td></tr>
+    <tr><td>协议里没有</td><td>体脂 / 水分 / 肌肉 / 基础代谢 / 骨量 / 内脏脂肪 / 温度 / 电量 —— <strong style="color:var(--amber)">不展示、不估算、不填充假值</strong></td></tr>
+  </table>
+  <div class="warn"><strong style="color:var(--amber)">注意</strong>：本页是设计意图的浏览器预览（CSS/SVG 模拟），不是真机截图；实际界面以 Android 工程运行效果为准。页面中的体重、次数、进度均为示例数据。</div>
+  </div>
+
+  <div class="foot">NEON//SCALE · 完整 Kotlin 源码见 CyberScale/app/src/main · README.md 含构建与协议详解</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- 外圈霓虹环 -->
+    <path
+        android:pathData="M54,26 A28,28 0 1,1 53.9,26"
+        android:strokeColor="#FF00F0FF"
+        android:strokeWidth="4"
+        android:strokeLineCap="round"
+        android:fillColor="#00000000" />
+    <!-- 内圈品红弧 -->
+    <path
+        android:pathData="M54,36 A18,18 0 0,1 72,54"
+        android:strokeColor="#FFFF2E97"
+        android:strokeWidth="4"
+        android:strokeLineCap="round"
+        android:fillColor="#00000000" />
+    <!-- 中心水平扫描线 -->
+    <path
+        android:pathData="M38,54 L70,54"
+        android:strokeColor="#FF00F0FF"
+        android:strokeWidth="3"
+        android:strokeLineCap="round" />
+    <!-- 中心脉冲点 -->
+    <path
+        android:fillColor="#FF39FF88"
+        android:pathData="M54,49 A5,5 0 1,1 53.9,49" />
+</vector>
