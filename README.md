@@ -9,9 +9,9 @@
 ![version](https://img.shields.io/badge/version-1.1.0-00F0FF)
 ![License](https://img.shields.io/badge/License-Apache_2.0-blue)
 
-![NEON//SCALE 四屏动态演示](docs/demo/neon-scale-demo.gif)
+![NEON//SCALE 四屏动态演示](https://edwardqoq.github.io/CyberScale/demo/neon-scale-demo.gif)
 
-<p align="center"><sub>12 秒演示 · 画面由真实界面代码渲染 · <a href="docs/demo/neon-scale-demo.mp4">下载 1080p 版本</a> · <a href="docs/demo/README.md">素材说明</a></sub></p>
+<p align="center"><sub>12 秒演示 · 画面由真实界面代码渲染 · <a href="https://edwardqoq.github.io/CyberScale/demo/neon-scale-demo.mp4">下载 1080p 版本</a> · <a href="docs/demo/README.md">素材说明</a></sub></p>
 
 不使用 GATT 连接、不联网、无账号、无第三方 SDK。秤只负责广播一个体重数值，其余全部由本机完成：解析帧、稳定判定、落进 Room、驱动霓虹动效。
 
